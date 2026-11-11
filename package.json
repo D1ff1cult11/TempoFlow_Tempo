@@ -16,16 +16,12 @@
     "stablecoins",
     "streaming-payments",
     "evm",
-    "defi",
-    "colosseum"
+    "defi"
   ],
   "author": "TempoFlow Core Team",
   "license": "MIT",
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^5.0.0",
     "hardhat": "^2.29.1"
-  },
-  "dependencies": {
-    "playwright": "^1.64.0"
   }
 }

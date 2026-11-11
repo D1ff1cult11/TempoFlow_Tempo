@@ -24,7 +24,7 @@ function AnimatedBalance({ value, symbol }) {
 }
 
 // ─── Token Balance Card ────────────────────────────────────────────────────────
-function TokenCard({ symbol, balance, icon: Icon, color, glow, isLoading, onWithdraw, isJudgeMode }) {
+function TokenCard({ symbol, balance, icon: Icon, color, glow, isLoading, onWithdraw, isDemoMode }) {
   return (
     <div
       style={{
@@ -118,7 +118,7 @@ function TokenCard({ symbol, balance, icon: Icon, color, glow, isLoading, onWith
       <button
         onClick={() => onWithdraw(symbol)}
         style={{
-          background: isJudgeMode ? `${color}22` : `${color}33`,
+          background: isDemoMode ? `${color}22` : `${color}33`,
           border: `1px solid ${color}55`,
           color,
           borderRadius: '8px',
@@ -139,7 +139,7 @@ function TokenCard({ symbol, balance, icon: Icon, color, glow, isLoading, onWith
           e.currentTarget.style.boxShadow = `0 0 16px ${glow}`;
         }}
         onMouseLeave={(e) => {
-          e.currentTarget.style.background = isJudgeMode ? `${color}22` : `${color}33`;
+          e.currentTarget.style.background = isDemoMode ? `${color}22` : `${color}33`;
           e.currentTarget.style.boxShadow = 'none';
         }}
       >
@@ -153,7 +153,7 @@ function TokenCard({ symbol, balance, icon: Icon, color, glow, isLoading, onWith
 // ─── Main TreasuryVault Component ─────────────────────────────────────────────
 export function TreasuryVault() {
   const {
-    isJudgeMode,
+    isDemoMode,
     merchantVaultUSDC,
     merchantVaultEURC,
     merchantSplitBps,
@@ -218,7 +218,7 @@ export function TreasuryVault() {
             >
               Merchant Settlement Vault
             </h2>
-            {isJudgeMode && (
+            {isDemoMode && (
               <span className="badge-pill badge-emerald" style={{ fontSize: '0.68rem' }}>
                 <Sparkles size={10} /> Demo Mode
               </span>
@@ -273,7 +273,7 @@ export function TreasuryVault() {
           glow="rgba(0,210,106,0.25)"
           isLoading={isVaultLoading}
           onWithdraw={withdrawFromVault}
-          isJudgeMode={isJudgeMode}
+          isDemoMode={isDemoMode}
         />
         <TokenCard
           symbol="EURC"
@@ -283,7 +283,7 @@ export function TreasuryVault() {
           glow="rgba(0,240,255,0.2)"
           isLoading={isVaultLoading}
           onWithdraw={withdrawFromVault}
-          isJudgeMode={isJudgeMode}
+          isDemoMode={isDemoMode}
         />
       </div>
 
@@ -429,7 +429,7 @@ export function TreasuryVault() {
             {connectedAddress.slice(0, 8)}…{connectedAddress.slice(-6)}
           </span>
         )}
-        {!connectedAddress && isJudgeMode && (
+        {!connectedAddress && isDemoMode && (
           <span style={{ fontSize: '0.72rem', color: 'var(--text-dim)', marginLeft: 'auto' }}>
             Simulated demo balances
           </span>

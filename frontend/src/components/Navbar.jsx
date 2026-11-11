@@ -4,8 +4,8 @@ import { Zap, ShieldCheck, Wallet, Sparkles, Award } from 'lucide-react';
 
 export function Navbar() {
   const {
-    isJudgeMode,
-    toggleJudgeMode,
+    isDemoMode,
+    toggleDemoMode,
     connectedAddress,
     connectWallet,
     mintTestnetFaucet,
@@ -56,9 +56,6 @@ export function Navbar() {
               }}>
                 Tempo<span className="gradient-text-emerald">Flow</span>
               </span>
-              <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>
-                Internal Code: AegisPay
-              </div>
             </div>
           </div>
 
@@ -86,7 +83,7 @@ export function Navbar() {
             border: '1px solid var(--border-subtle)',
           }}>
             <button
-              onClick={() => toggleJudgeMode(true)}
+              onClick={() => toggleDemoMode(true)}
               style={{
                 padding: '6px 12px',
                 borderRadius: '8px',
@@ -98,16 +95,16 @@ export function Navbar() {
                 display: 'flex',
                 alignItems: 'center',
                 gap: '6px',
-                background: isJudgeMode ? 'var(--tempo-emerald)' : 'transparent',
-                color: isJudgeMode ? '#06080D' : 'var(--text-muted)',
+                background: isDemoMode ? 'var(--tempo-emerald)' : 'transparent',
+                color: isDemoMode ? '#06080D' : 'var(--text-muted)',
                 transition: 'all 0.2s ease',
               }}
             >
               <Sparkles size={14} />
-              One-Click Judge Demo
+              Demo Mode
             </button>
             <button
-              onClick={() => toggleJudgeMode(false)}
+              onClick={() => toggleDemoMode(false)}
               style={{
                 padding: '6px 12px',
                 borderRadius: '8px',
@@ -118,9 +115,9 @@ export function Navbar() {
                 display: 'flex',
                 alignItems: 'center',
                 gap: '6px',
-                background: !isJudgeMode ? 'rgba(0, 240, 255, 0.2)' : 'transparent',
-                color: !isJudgeMode ? 'var(--tempo-cyan)' : 'var(--text-muted)',
-                border: !isJudgeMode ? '1px solid rgba(0, 240, 255, 0.4)' : '1px solid transparent',
+                background: !isDemoMode ? 'rgba(0, 240, 255, 0.2)' : 'transparent',
+                color: !isDemoMode ? 'var(--tempo-cyan)' : 'var(--text-muted)',
+                border: !isDemoMode ? '1px solid rgba(0, 240, 255, 0.4)' : '1px solid transparent',
                 transition: 'all 0.2s ease',
               }}
             >
@@ -130,7 +127,7 @@ export function Navbar() {
           </div>
 
           {/* Testnet Faucet Button (Live Mode) */}
-          {!isJudgeMode && (
+          {!isDemoMode && (
             <button
               onClick={() => mintTestnetFaucet('USDC')}
               className="btn-secondary"

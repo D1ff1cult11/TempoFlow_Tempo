@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Navbar } from './components/Navbar';
-import { JudgeBanner } from './components/JudgeBanner';
+import { DemoBanner } from './components/DemoBanner';
 import { MerchantTerminal } from './components/MerchantTerminal';
 import { PayrollOdometer } from './components/PayrollOdometer';
 import { TreasuryVault } from './components/TreasuryVault';
@@ -16,8 +16,8 @@ export default function App() {
       {/* 1. Header & Live Telemetry Navbar */}
       <Navbar />
 
-      {/* 2. Top Sticky One-Click Judge Simulation Bar */}
-      <JudgeBanner />
+      {/* 2. Top sticky demo simulation bar */}
+      <DemoBanner />
 
       {/* 3. Main Protocol Terminal Workspace */}
       <main style={{ maxWidth: '1280px', width: '100%', margin: '0 auto', padding: '24px', flex: 1 }}>
@@ -35,7 +35,6 @@ export default function App() {
               <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
                 <span className="badge-pill badge-emerald">Tempo L1 Ecosystem</span>
                 <span className="badge-pill badge-solana">Solana Retail Ingress</span>
-                <span className="badge-pill badge-cyan">Colosseum World's Fair 2026</span>
               </div>
               <h1 style={{
                 fontSize: 'clamp(1.5rem, 3.5vw, 2.2rem)',
@@ -141,12 +140,12 @@ export default function App() {
           gap: '16px',
         }}>
           <div>
-            <strong>TempoFlow Protocol</strong> • Built for the Colosseum Crypto World's Fair (Fall 2026)
+            <strong>TempoFlow</strong> • Stablecoin payments & streaming payroll on Tempo
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
             <a
-              href="https://github.com/D1ff1cult11/TempoFlow"
+              href="https://github.com/D1ff1cult11/TempoFlow_Tempo"
               target="_blank"
               rel="noreferrer"
               style={{ color: 'var(--text-muted)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '6px' }}

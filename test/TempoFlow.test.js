@@ -253,7 +253,7 @@ describe("⚡ TempoFlow Protocol Master Test Suite", function () {
     });
   });
 
-  describe("4. Security Guards, Emergency Circuit Breaker & Living Odometer (Audited)", function () {
+  describe("4. Security Guards, Emergency Circuit Breaker & Living Odometer", function () {
     it("TC-09: Emergency Pause Blocks Payments & Non-Owner Cannot Pause", async function () {
       const orderId = ethers.keccak256(ethers.toUtf8Bytes("ORDER-PAUSE-TEST"));
 

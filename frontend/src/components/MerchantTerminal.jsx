@@ -10,7 +10,7 @@ export function MerchantTerminal() {
   const qrCanvasRef = useRef(null);
 
   const {
-    isJudgeMode,
+    isDemoMode,
     connectedAddress,
     connectWallet,
     executePayment,
@@ -234,7 +234,7 @@ export function MerchantTerminal() {
         </div>
 
         {/* Pay Action Trigger (Dynamic: Live Web3 on-chain vs Demo sandbox) */}
-        {!isJudgeMode && !connectedAddress ? (
+        {!isDemoMode && !connectedAddress ? (
           <button
             onClick={connectWallet}
             className="btn-action-solana"
@@ -252,21 +252,21 @@ export function MerchantTerminal() {
               width: '100%',
               justifyContent: 'center',
               padding: '12px',
-              background: !isJudgeMode ? 'linear-gradient(135deg, #00D26A 0%, #00F0FF 100%)' : undefined,
-              color: !isJudgeMode ? '#07090E' : undefined,
+              background: !isDemoMode ? 'linear-gradient(135deg, #00D26A 0%, #00F0FF 100%)' : undefined,
+              color: !isDemoMode ? '#07090E' : undefined,
               fontWeight: 700,
             }}
           >
             <Zap size={18} />
             {relayerStep !== 'IDLE'
               ? 'Broadcasting to Tempo L1 (0.6s Lane)...'
-              : !isJudgeMode
+              : !isDemoMode
               ? `⚡ Execute $${posAmount} Payment On-Chain (Tempo L1)`
               : `Simulate Customer Paying $${posAmount} (Demo Sandbox)`}
           </button>
         )}
         <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textAlign: 'center', marginTop: '6px' }}>
-          {!isJudgeMode
+          {!isDemoMode
             ? '⚡ Live Mode: Real on-chain transaction calling TempoFlowRouter.sol • 10 bps fee'
             : '⭐ Demo Mode: 0.6s visual simulation with synthesized audio chime & receipt'}
         </div>
