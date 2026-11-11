@@ -2,7 +2,7 @@
 
 > **Stablecoin payments, streaming payroll and merchant settlement on [Tempo](https://tempo.xyz).**
 
-[![Live Demo](https://img.shields.io/badge/Demo-tempoflow.vercel.app-00F0FF?style=for-the-badge&logo=vercel)](https://tempoflow.vercel.app/)
+[![Live Demo](https://img.shields.io/badge/Demo-tempoflow--app.vercel.app-00F0FF?style=for-the-badge&logo=vercel)](https://tempoflow-app.vercel.app/)
 [![Solidity](https://img.shields.io/badge/Solidity-0.8.24-363636?logo=solidity)](https://soliditylang.org/)
 [![Status](https://img.shields.io/badge/Status-Early%20prototype-orange)](#-project-status)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
