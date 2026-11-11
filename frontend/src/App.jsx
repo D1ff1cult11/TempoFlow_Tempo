@@ -43,7 +43,7 @@ export default function App() {
                 letterSpacing: '-0.02em',
                 lineHeight: 1.2,
               }}>
-                The Sub-Second Programmable Stablecoin Highway
+                Stablecoin payments &amp; payroll on Tempo
               </h1>
               <p style={{
                 fontSize: '0.92rem',
@@ -52,7 +52,7 @@ export default function App() {
                 maxWidth: '780px',
                 lineHeight: 1.5,
               }}>
-                Zero gas token friction. Settle retail merchant checkouts in <strong>0.6 seconds</strong> with <strong>10 bps fees</strong>, execute zero-slippage FX swaps at the validator layer, and stream continuous contractor salaries down to the exact second.
+                Accept stablecoin payments with a <strong>10 bps protocol fee</strong>, convert between currencies, and stream contractor salaries that accrue every second. Early prototype: in Demo Mode everything below is simulated.
               </p>
             </div>
 

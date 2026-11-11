@@ -63,7 +63,7 @@ export function Navbar() {
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <div className="badge-pill badge-emerald">
               <span className="pulse-dot"></span>
-              Tempo L1 (0.6s)
+              Tempo
             </div>
             <div className="badge-pill badge-solana">
               Solana Ingress

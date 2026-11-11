@@ -17,7 +17,7 @@ export function PayrollOdometer() {
   const handleDownloadProof = () => {
     const csvContent = "data:text/csv;charset=utf-8," +
       "Timestamp,Employer,Employee,Token,RatePerSecond,ClaimableBalance,Network,Finality\n" +
-      `${new Date().toISOString()},0xf39F...2266,${streamEmployeeAddress},USDC,$${streamRatePerSecond.toFixed(7)},$${streamClaimableBalance.toFixed(6)},Tempo L1,0.6s Deterministic`;
+      `${new Date().toISOString()},0xf39F...2266,${streamEmployeeAddress},USDC,$${streamRatePerSecond.toFixed(7)},$${streamClaimableBalance.toFixed(6)},Tempo,Simulated`;
 
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
@@ -58,10 +58,10 @@ export function PayrollOdometer() {
           </div>
           <div>
             <h3 style={{ fontSize: '1.15rem', fontWeight: 800, fontFamily: 'var(--font-sans)', color: '#FFFFFF' }}>
-              The Living Salary Odometer
+              Streaming Payroll
             </h3>
             <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-              Continuous By-The-Second Stablecoin Payroll on Tempo L1
+              Salary accrues every second; withdraw any time
             </p>
           </div>
         </div>
@@ -69,7 +69,7 @@ export function PayrollOdometer() {
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <div className="badge-pill badge-emerald">
             <span className="pulse-dot"></span>
-            Streaming Live (50ms)
+            Simulated
           </div>
         </div>
       </div>
@@ -149,9 +149,9 @@ export function PayrollOdometer() {
         </div>
 
         <div style={{ background: 'rgba(255, 255, 255, 0.03)', padding: '12px 14px', borderRadius: '10px', border: '1px solid var(--border-subtle)' }}>
-          <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Gas Claim Cost</div>
+          <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Network Fees</div>
           <div style={{ fontSize: '1.1rem', fontWeight: 700, fontFamily: 'var(--font-mono)', color: 'var(--tempo-emerald)', marginTop: '2px' }}>
-            $0.00 (Gasless)
+            Paid in stablecoins
           </div>
         </div>
       </div>
@@ -174,7 +174,7 @@ export function PayrollOdometer() {
         >
           <ArrowDownCircle size={20} />
           {!isDemoMode
-            ? `⚡ Withdraw Salary On-Chain ($${streamClaimableBalance.toFixed(2)})`
+            ? `Withdraw Salary On-Chain ($${streamClaimableBalance.toFixed(2)})`
             : `Claim Earned Salary ($${streamClaimableBalance.toFixed(2)})`}
         </button>
 
@@ -191,7 +191,7 @@ export function PayrollOdometer() {
           onClick={handleDownloadProof}
           className="btn-secondary"
           style={{ justifyContent: 'center' }}
-          title="Download Cryptographic Tax Receipt"
+          title="Download a CSV of this stream (demo data)"
         >
           <Download size={16} />
           Export Proof

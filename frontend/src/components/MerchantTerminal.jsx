@@ -63,13 +63,13 @@ export function MerchantTerminal() {
                 Merchant Point-of-Sale
               </h3>
               <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
-                Sub-Second Ingress from Solana & Tempo L1
+                Accept stablecoin payments on Tempo (Solana intake simulated)
               </p>
             </div>
           </div>
           <div className="badge-pill badge-emerald">
             <span className="pulse-dot"></span>
-            0.6s Lane
+            Simulated
           </div>
         </div>
 
@@ -82,7 +82,7 @@ export function MerchantTerminal() {
           marginBottom: '16px',
         }}>
           <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '6px' }}>
-            Merchant Settlement Preference (Enshrined AMM Precompile):
+            Settle in (currency conversion uses a mock rate):
           </div>
           <div style={{ display: 'flex', gap: '8px' }}>
             <button
@@ -229,7 +229,7 @@ export function MerchantTerminal() {
           )}
 
           <div style={{ fontSize: '0.72rem', color: 'var(--text-dim)', marginTop: '8px', fontFamily: 'var(--font-mono)' }}>
-            Scan with Phantom or Tempo mobile wallet for instant checkout
+            Example payment QR (demo only)
           </div>
         </div>
 
@@ -241,7 +241,7 @@ export function MerchantTerminal() {
             style={{ width: '100%', justifyContent: 'center', padding: '12px' }}
           >
             <Zap size={18} />
-            Connect Web3 Wallet to Pay on Tempo L1
+            Connect Wallet to Pay on Tempo
           </button>
         ) : (
           <button
@@ -259,16 +259,16 @@ export function MerchantTerminal() {
           >
             <Zap size={18} />
             {relayerStep !== 'IDLE'
-              ? 'Broadcasting to Tempo L1 (0.6s Lane)...'
+              ? 'Processing payment...'
               : !isDemoMode
-              ? `⚡ Execute $${posAmount} Payment On-Chain (Tempo L1)`
+              ? `Pay $${posAmount} On-Chain (Tempo)`
               : `Simulate Customer Paying $${posAmount} (Demo Sandbox)`}
           </button>
         )}
         <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textAlign: 'center', marginTop: '6px' }}>
           {!isDemoMode
-            ? '⚡ Live Mode: Real on-chain transaction calling TempoFlowRouter.sol • 10 bps fee'
-            : '⭐ Demo Mode: 0.6s visual simulation with synthesized audio chime & receipt'}
+            ? 'Live Mode: calls TempoFlowRouter.sol (requires a real deployment) • 10 bps fee'
+            : 'Demo Mode: simulated payment with sound and receipt. No real funds move'}
         </div>
       </div>
 
@@ -280,7 +280,7 @@ export function MerchantTerminal() {
               Non-Custodial Settlement Vaults
             </h3>
             <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
-              Isolated Multi-Token Accounting on Tempo L1
+              Separate balances per stablecoin
             </p>
           </div>
           <div className="badge-pill badge-cyan">
@@ -328,7 +328,7 @@ export function MerchantTerminal() {
               €{merchantVaultEURC.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </div>
             <div style={{ fontSize: '0.7rem', color: 'var(--text-dim)', marginTop: '2px' }}>
-              Zero-Slippage Consensus FX
+              Converted at mock rate
             </div>
           </div>
         </div>
@@ -338,7 +338,7 @@ export function MerchantTerminal() {
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
             <span style={{ fontSize: '0.82rem', fontWeight: 700, color: '#FFFFFF', display: 'flex', alignItems: 'center', gap: '6px' }}>
               <RefreshCw size={14} className="pulse-dot" style={{ display: 'inline-block' }} />
-              Live Settlement Feed (0.6s Block Finality)
+              Settlement Feed (simulated)
             </span>
             <span style={{ fontSize: '0.72rem', color: 'var(--text-dim)' }}>Auto-Refresh</span>
           </div>
