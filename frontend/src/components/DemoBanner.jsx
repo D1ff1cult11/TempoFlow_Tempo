@@ -36,10 +36,10 @@ export function DemoBanner() {
             <span className="pulse-dot"></span>
             <div>
               <div style={{ fontSize: '0.88rem', fontWeight: 700, color: '#FFFFFF', fontFamily: 'var(--font-sans)' }}>
-                ⚡ Live On-Chain Web3 Mode (Tempo L1 Testnet - Chain 4242)
+                Live Web3 Mode (not available yet)
               </div>
               <div style={{ fontSize: '0.74rem', color: 'var(--text-muted)' }}>
-                Real smart contract execution via ethers.js • Direct interaction with TempoFlowRouter & TempoPayrollStream
+                TempoFlow's contracts are not deployed to Tempo yet, so on-chain actions here will fail. Use Demo Mode to try the product.
               </div>
             </div>
           </div>
@@ -140,7 +140,7 @@ export function DemoBanner() {
               Demo Mode (simulated, no wallet needed)
             </div>
             <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-              Test sub-second settlement, continuous time-travel, and consensus FX with zero wallet/faucet friction:
+              Try payments, payroll and currency conversion in a browser simulation. No wallet or real funds involved:
             </div>
           </div>
         </div>
@@ -182,7 +182,7 @@ export function DemoBanner() {
             }}
           >
             <ArrowRightLeft size={14} />
-            3. Simulate Enshrined FX (USDC→EURC)
+            3. Simulate Currency Conversion (USDC→EURC)
           </button>
         </div>
       </div>

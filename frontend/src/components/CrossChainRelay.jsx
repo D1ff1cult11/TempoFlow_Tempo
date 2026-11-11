@@ -9,23 +9,23 @@ export function CrossChainRelay() {
     {
       id: 'SOLANA_LOCK',
       name: '1. Solana Ingress (Anchor)',
-      desc: 'SPL-USDC locked in Escrow PDA (1h timeout guarantee)',
+      desc: 'SPL-USDC held in program escrow; payer can reclaim after 1h timeout',
       active: relayerStep === 'SOLANA_LOCK',
       done: relayerStep === 'RELAYER_TRANSIT' || relayerStep === 'TEMPO_FINALITY',
       color: 'var(--solana-purple)',
     },
     {
       id: 'RELAYER_TRANSIT',
-      name: '2. Relayer Network',
-      desc: 'Telemetry proof verified; routes 20-byte EVM recipient',
+      name: '2. Relayer (planned)',
+      desc: 'Forwards the payment intent to the Tempo recipient address (not built yet)',
       active: relayerStep === 'RELAYER_TRANSIT',
       done: relayerStep === 'TEMPO_FINALITY',
       color: 'var(--tempo-cyan)',
     },
     {
       id: 'TEMPO_FINALITY',
-      name: '3. Tempo L1 Payment Lane',
-      desc: 'Deterministic 0.6s consensus finality + 10 bps fee',
+      name: '3. Tempo Settlement',
+      desc: 'TempoFlowRouter pays the merchant, minus a 10 bps protocol fee',
       active: relayerStep === 'TEMPO_FINALITY',
       done: false,
       color: 'var(--tempo-emerald)',
@@ -37,14 +37,14 @@ export function CrossChainRelay() {
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
         <div>
           <h3 style={{ fontSize: '1.05rem', fontWeight: 700, fontFamily: 'var(--font-sans)', color: '#FFFFFF' }}>
-            Cross-Chain Telemetry Pipeline
+            Cross-Chain Payment Flow
           </h3>
           <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
-            Solana Retail Ingress ──► Tempo L1 Sub-Second Finality ({relayerLatencyMs}ms)
+            Solana payment ──► Tempo settlement (simulated, {relayerLatencyMs}ms)
           </p>
         </div>
         <div className="badge-pill badge-solana">
-          Dual-VM Architecture
+          Simulated
         </div>
       </div>
 

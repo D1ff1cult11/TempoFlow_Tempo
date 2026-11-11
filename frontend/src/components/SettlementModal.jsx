@@ -62,10 +62,10 @@ export function SettlementModal() {
           </div>
 
           <h3 style={{ fontSize: '1.25rem', fontWeight: 800, fontFamily: 'var(--font-sans)', color: '#FFFFFF' }}>
-            Payment Settled in 0.6s
+            {activeReceipt.isOnChain ? 'Payment Settled' : 'Payment Settled (simulated)'}
           </h3>
           <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-            Deterministic Consensus Finality on Tempo L1
+            {activeReceipt.isOnChain ? 'Confirmed on Tempo' : 'Demo receipt: no real transaction was made'}
           </p>
         </div>
 
@@ -99,9 +99,9 @@ export function SettlementModal() {
           </div>
 
           <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid var(--border-subtle)', paddingTop: '10px' }}>
-            <span style={{ color: 'var(--text-muted)' }}>Network Finality:</span>
+            <span style={{ color: 'var(--text-muted)' }}>Status:</span>
             <span style={{ color: 'var(--tempo-emerald)', fontWeight: 600 }}>
-              {activeReceipt.isOnChain ? '⚡ Confirmed On-Chain (0.62s)' : '0.62s Sub-Second Finality'}
+              {activeReceipt.isOnChain ? 'Confirmed on-chain' : 'Simulated (0.62s)'}
             </span>
           </div>
 

@@ -309,13 +309,13 @@ export function TreasuryVault() {
             Auto-Split Revenue Forwarder
           </span>
           <span className="badge-pill badge-cyan" style={{ fontSize: '0.68rem' }}>
-            On-Chain Configurable
+            Configurable
           </span>
         </div>
 
         <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: '16px', lineHeight: 1.5 }}>
           Incoming settlement automatically forwards a slice to the payroll reserve fund. Configured
-          directly on <code style={{ color: 'var(--tempo-cyan)' }}>MerchantSettlementVault.sol</code> via validator consensus.
+          in <code style={{ color: 'var(--tempo-cyan)' }}>MerchantSettlementVault.sol</code>.
         </p>
 
         {/* Slider Row */}
