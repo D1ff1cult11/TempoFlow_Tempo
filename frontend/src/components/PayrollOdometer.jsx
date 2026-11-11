@@ -4,7 +4,7 @@ import { Timer, ArrowDownCircle, Download, FastForward, CheckCircle2, TrendingUp
 
 export function PayrollOdometer() {
   const {
-    isJudgeMode,
+    isDemoMode,
     streamClaimableBalance,
     streamTotalAccrued,
     streamRemainingEscrow,
@@ -167,13 +167,13 @@ export function PayrollOdometer() {
             justifyContent: 'center',
             padding: '14px 20px',
             fontSize: '1rem',
-            background: !isJudgeMode ? 'linear-gradient(135deg, #00D26A 0%, #00F0FF 100%)' : undefined,
-            color: !isJudgeMode ? '#07090E' : undefined,
+            background: !isDemoMode ? 'linear-gradient(135deg, #00D26A 0%, #00F0FF 100%)' : undefined,
+            color: !isDemoMode ? '#07090E' : undefined,
             fontWeight: 700,
           }}
         >
           <ArrowDownCircle size={20} />
-          {!isJudgeMode
+          {!isDemoMode
             ? `⚡ Withdraw Salary On-Chain ($${streamClaimableBalance.toFixed(2)})`
             : `Claim Earned Salary ($${streamClaimableBalance.toFixed(2)})`}
         </button>

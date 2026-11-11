@@ -6,8 +6,8 @@ import { ethers } from 'ethers';
 
 // Global singleton state for React components
 let state = {
-  // Mode selection: Judge Demo (default) vs Live On-Chain
-  isJudgeMode: true,
+  // Mode selection: Demo Mode (default) vs Live On-Chain
+  isDemoMode: true,
   
   // Wallet Connection
   connectedAddress: null,
@@ -100,11 +100,11 @@ export function useTempoStore() {
   }, []);
 
   // ==========================================
-  // ACTIONS: JUDGE SIMULATION MODE (MODE A)
+  // ACTIONS: DEMO SIMULATION MODE (MODE A)
   // ==========================================
 
-  const toggleJudgeMode = (enabled) => {
-    state.isJudgeMode = enabled;
+  const toggleDemoMode = (enabled) => {
+    state.isDemoMode = enabled;
     sound.playClick();
     emit();
   };
@@ -242,7 +242,7 @@ export function useTempoStore() {
   // ==========================================
 
   const withdrawFromVault = async (tokenSymbol = 'USDC') => {
-    if (state.isJudgeMode || !state.connectedAddress || !window.ethereum) {
+    if (state.isDemoMode || !state.connectedAddress || !window.ethereum) {
       // Demo: move vault funds to wallet balance
       sound.playCashChime();
       if (tokenSymbol === 'USDC') {
@@ -300,7 +300,7 @@ export function useTempoStore() {
   };
 
   const refreshVaultBalances = async () => {
-    if (state.isJudgeMode || !window.ethereum) {
+    if (state.isDemoMode || !window.ethereum) {
       // Demo: just flash the loading state
       state.isVaultLoading = true;
       emit();
@@ -338,7 +338,7 @@ export function useTempoStore() {
     state.merchantSplitBps = bps;
     emit();
 
-    if (state.isJudgeMode || !state.connectedAddress || !window.ethereum) return;
+    if (state.isDemoMode || !state.connectedAddress || !window.ethereum) return;
 
     try {
       const provider = new ethers.BrowserProvider(window.ethereum);
@@ -382,8 +382,8 @@ export function useTempoStore() {
 
   const connectWallet = async () => {
     if (typeof window === 'undefined' || !window.ethereum) {
-      alert('MetaMask or a Web3 EVM wallet is required for Live Mode. Switching to Judge Demo Mode!');
-      state.isJudgeMode = true;
+      alert('MetaMask or a Web3 EVM wallet is required for Live Mode. Switching to Demo Mode.');
+      state.isDemoMode = true;
       emit();
       return;
     }
@@ -584,7 +584,7 @@ export function useTempoStore() {
   };
 
   const executePayment = async (amount = 50.0) => {
-    if (state.isJudgeMode) {
+    if (state.isDemoMode) {
       return simulateSolanaPayment(amount);
     } else {
       return executeLivePayment(amount);
@@ -592,7 +592,7 @@ export function useTempoStore() {
   };
 
   const claimSalary = async () => {
-    if (state.isJudgeMode) {
+    if (state.isDemoMode) {
       return simulateClaimSalary();
     } else {
       return executeLiveClaimSalary();
@@ -601,7 +601,7 @@ export function useTempoStore() {
 
   return {
     ...store,
-    toggleJudgeMode,
+    toggleDemoMode,
     simulateSolanaPayment,
     simulateTimeWarp,
     simulateClaimSalary,

@@ -2,9 +2,9 @@ import React from 'react';
 import { useTempoStore } from '../store/useTempoStore';
 import { Sparkles, FastForward, ArrowRightLeft, Send, CheckCircle2 } from 'lucide-react';
 
-export function JudgeBanner() {
+export function DemoBanner() {
   const {
-    isJudgeMode,
+    isDemoMode,
     simulateSolanaPayment,
     simulateTimeWarp,
     simulateFXSwap,
@@ -15,7 +15,7 @@ export function JudgeBanner() {
     addTempoNetworkToMetamask,
   } = useTempoStore();
 
-  if (!isJudgeMode) {
+  if (!isDemoMode) {
     return (
       <div style={{
         background: 'linear-gradient(90deg, rgba(0, 240, 255, 0.12) 0%, rgba(153, 69, 255, 0.12) 100%)',
@@ -137,7 +137,7 @@ export function JudgeBanner() {
           </div>
           <div>
             <div style={{ fontSize: '0.9rem', fontWeight: 700, color: '#FFFFFF', fontFamily: 'var(--font-sans)' }}>
-              ⭐ One-Click Judge Simulation Bar
+              Demo Mode (simulated, no wallet needed)
             </div>
             <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
               Test sub-second settlement, continuous time-travel, and consensus FX with zero wallet/faucet friction:

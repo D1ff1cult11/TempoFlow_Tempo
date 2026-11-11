@@ -1,7 +1,8 @@
-const { ethers } = require("hardhat");
+const { ethers, network } = require("hardhat");
 
 async function main() {
-  console.log("🚀 Deploying TempoFlow Protocol to Tempo L1...");
+  const { chainId } = await ethers.provider.getNetwork();
+  console.log(`🚀 Deploying TempoFlow to network '${network.name}' (chainId ${chainId})...`);
 
   const [deployer] = await ethers.getSigners();
   console.log(`Deployer Account: ${deployer.address}`);
@@ -61,8 +62,8 @@ async function main() {
   console.log("🎉 DEPLOYMENT SUMMARY FOR FRONTEND CONFIG (Phase 3)");
   console.log("==================================================");
   const deploymentInfo = {
-    network: "Tempo L1 Testnet",
-    chainId: 4242,
+    network: network.name,
+    chainId: Number(chainId),
     contracts: {
       USDC: usdcAddress,
       EURC: eurcAddress,
@@ -84,10 +85,10 @@ async function main() {
     fs.mkdirSync(deployDir, { recursive: true });
   }
   fs.writeFileSync(
-    path.join(deployDir, "tempoTestnet.json"),
+    path.join(deployDir, `${network.name}.json`),
     JSON.stringify(deploymentInfo, null, 2)
   );
-  console.log(`\nDeployment artifact written to: deployments/tempoTestnet.json`);
+  console.log(`\nDeployment artifact written to: deployments/${network.name}.json`);
 }
 
 main()
