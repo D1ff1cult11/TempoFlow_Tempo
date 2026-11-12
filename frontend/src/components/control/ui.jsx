@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ExternalLink, Loader2 } from 'lucide-react';
 import { txUrl, addressUrl, short, errorText } from '../../lib/tempo';
+import { toCsv } from '../../lib/exports';
 
 /** Button that runs an async action, shows a spinner, and reports errors/success to `onResult`. */
 export function AsyncButton({ onClick, children, className = 'btn-primary', disabled, onResult, title }) {
@@ -80,9 +81,7 @@ export function Bar({ used, total }) {
 }
 
 export function downloadCsv(filename, rows) {
-  const esc = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`;
-  const csv = rows.map((r) => r.map(esc).join(',')).join('\n');
-  const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
+  const url = URL.createObjectURL(new Blob([toCsv(rows)], { type: 'text/csv' }));
   const a = document.createElement('a');
   a.href = url;
   a.download = filename;

@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { BookOpen, Download, RefreshCw } from 'lucide-react';
 import { useWorkspace } from '../../store/useWorkspace';
 import { spendEvents, memoTransfers, blockTime, tokenSymbol, usd, short, TOKENS } from '../../lib/tempo';
-import { AsyncButton, Result, TxLink, AddressLink, downloadCsv } from './ui';
+import { AsyncButton, Result, TxLink, AddressLink, Field, downloadCsv } from './ui';
+import { EXPORTS, DATE_FORMATS } from '../../lib/exports';
 
 /**
  * One ledger for people and agents, rebuilt from Tempo itself:
@@ -62,6 +63,8 @@ export function LedgerPanel() {
   const ws = useWorkspace();
   const [rows, setRows] = useState(null);
   const [result, setResult] = useState(null);
+  const [exportFormat, setExportFormat] = useState('quickbooks');
+  const [dateFormat, setDateFormat] = useState('DD/MM/YYYY');
 
   const totals = (rows || []).reduce(
     (acc, r) => {
@@ -73,22 +76,10 @@ export function LedgerPanel() {
     { people: 0, agents: 0, byTeam: {} },
   );
 
-  const exportCsv = () =>
-    downloadCsv(`tempoflow-ledger-${new Date().toISOString().slice(0, 10)}.csv`, [
-      ['time_utc', 'type', 'team', 'payee_or_agent', 'to', 'token', 'amount', 'memo', 'agent_limit_left', 'tx_hash'],
-      ...rows.map((r) => [
-        r.at ? new Date(r.at).toISOString() : '',
-        r.kind,
-        r.team,
-        r.who,
-        r.to,
-        tokenSymbol(r.token),
-        r.amount.toFixed(6),
-        r.memo,
-        r.remaining ?? '',
-        r.hash,
-      ]),
-    ]);
+  const exportCsv = () => {
+    const fmt = EXPORTS[exportFormat];
+    downloadCsv(`${fmt.file}-${new Date().toISOString().slice(0, 10)}.csv`, fmt.build(rows, dateFormat));
+  };
 
   return (
     <div className="glass-panel cp-card cp-stack">
@@ -111,12 +102,42 @@ export function LedgerPanel() {
           >
             <RefreshCw size={14} /> Load from chain
           </AsyncButton>
-          <button className="btn-secondary btn-sm" disabled={!rows?.length} onClick={exportCsv}>
-            <Download size={14} /> Export CSV
-          </button>
         </div>
       </div>
       {result && !result.ok && <Result result={result} />}
+
+      {rows?.length > 0 && (
+        <div className="cp-form">
+          <Field label="Export for">
+            <select className="cp-select" value={exportFormat} onChange={(e) => setExportFormat(e.target.value)}>
+              {Object.entries(EXPORTS).map(([id, f]) => (
+                <option key={id} value={id}>
+                  {f.label}
+                </option>
+              ))}
+            </select>
+          </Field>
+          {exportFormat !== 'full' && (
+            <Field label="Date format (match your accounting settings)">
+              <select className="cp-select" value={dateFormat} onChange={(e) => setDateFormat(e.target.value)}>
+                {DATE_FORMATS.map((d) => (
+                  <option key={d}>{d}</option>
+                ))}
+              </select>
+            </Field>
+          )}
+          <button className="btn-primary" onClick={exportCsv}>
+            <Download size={15} /> Export CSV
+          </button>
+        </div>
+      )}
+      {rows?.length > 0 && exportFormat !== 'full' && (
+        <div className="cp-note">
+          Payments are exported as negative amounts (money out). Network fees under $0.01 are left out because{' '}
+          {exportFormat === 'xero' ? 'Xero' : 'QuickBooks'} only takes cents. Import it into the bank account that
+          represents this treasury.
+        </div>
+      )}
 
       {rows && (
         <div className="cp-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))' }}>
