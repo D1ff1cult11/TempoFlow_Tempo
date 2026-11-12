@@ -29,7 +29,9 @@ Work is tracked as GitHub issues, grouped by milestone. Labels: `agents`, `payro
 
 ## M2: Pilot-ready (next 4–6 weeks)
 
-- [ ] Server-side fee payer (`withFeePayer` transport); remove the browser sponsor key
+- [x] Server-side fee payer (`withFeePayer` transport + Vercel relay); browser sponsor key removed
+- [x] Redesign: sidebar app, Overview page, 60/30/10 color system with two candidate themes
+- [ ] Pick the final theme and remove the other
 - [ ] Agent SDK: a small Node/TS package an agent runtime uses to pay with its key + memo (and with MPP)
 - [ ] Hand-off of agent keys: generate in the agent runtime, register the public key in TempoFlow (keys never touch the panel)
 - [ ] Alerts: webhook / email when an agent drops under 20% of its daily budget, hits a limit, or nears expiry

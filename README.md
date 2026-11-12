@@ -33,7 +33,7 @@ data, compute and services on their own). TempoFlow is the control panel for bot
 | Pay runs: batched transfers with invoice memos | ✅ **Live on Tempo testnet** |
 | Ledger rebuilt from chain + CSV export | ✅ **Live on Tempo testnet** |
 | Stablecoin conversion via the Stablecoin DEX | ✅ **Live on Tempo testnet** |
-| Fee sponsorship | 🟡 Works on testnet with a **browser-held demo sponsor key**. Production needs a server-side fee payer |
+| Fee sponsorship | ✅ **Server-side** fee-payer relay (`api/relay.mjs`, a Vercel function). The sponsor key lives only in the server environment; the relay only sponsors stablecoin (TIP-20) calls on testnet |
 | Company account | 🟡 Passkey (WebAuthn) or a throwaway test key, stored in your browser. Testnet only |
 | Agent keys | 🟡 Kept in the browser for testing. In production they live in the agent's own runtime |
 | Pooled team budgets enforced on-chain | ❌ Not possible natively today (Tempo limits are per key). See [ROADMAP](ROADMAP.md) |
@@ -68,6 +68,15 @@ need on top: teams, caps, a ledger that joins agents and people, alerts and expo
 npm run frontend:dev
 ```
 Open the app, create a company account (passkey or test key), click **Get testnet funds**, then add an agent.
+Use the theme switch in the sidebar to compare the two color themes (Indigo and Amber).
+
+### Fee sponsorship (optional)
+Locally, run the relay next to the app. `--throwaway` uses a fresh in-memory testnet key funded by the faucet:
+```bash
+node scripts/relay-dev.mjs --throwaway
+```
+On Vercel, create a testnet sponsor key with `node scripts/new-sponsor-key.mjs` and add it as the environment
+variable `TEMPO_SPONSOR_PRIVATE_KEY`. Without it, the app still works and agents pay their own fees.
 
 ### End-to-end smoke tests against Tempo testnet
 Each run creates throwaway keys and uses faucet funds only.
@@ -75,6 +84,7 @@ Each run creates throwaway keys and uses faucet funds only.
 cd frontend
 node scripts/smoke-agent-budget.mjs   # authorize agent, pay with memo, overspend blocked, revoke
 node scripts/smoke-payrun.mjs         # 3 payouts in 1 sponsored transaction, DEX quote + swap
+node scripts/smoke-relay.mjs          # server relay sponsors an agent payment; policy refuses other calls
 ```
 
 ### Contracts (streaming payroll, merchant router, vault)
@@ -91,7 +101,10 @@ npx hardhat test
 | :--- | :--- |
 | `frontend/src/lib/tempo.js` | All Tempo calls: accounts, access keys, memos, pay runs, DEX, event history |
 | `frontend/src/store/useWorkspace.js` | Workspace state (company, teams, agents, people) and the team-cap rule |
-| `frontend/src/components/control/` | Control panel screens |
+| `frontend/src/components/control/` | Control panel screens (Overview, Agents, People, Ledger, Treasury) |
+| `frontend/src/components/layout/` | Sidebar app shell, bottom navigation on phones, theme switch |
+| `frontend/src/index.css` | Design tokens: 60/30/10 color system, two themes |
+| `api/` | Vercel serverless fee-payer relay |
 | `frontend/scripts/` | Testnet smoke tests |
 | `contracts/` | `TempoFlowRouter`, `TempoPayrollStream`, `MerchantSettlementVault` (+ mocks) |
 | `archive/` | Parked code (Solana intake) |
