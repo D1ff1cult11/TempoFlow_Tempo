@@ -4,7 +4,7 @@ import { sound } from '../audio/soundEffects';
 
 const themeConfetti = () => {
   const css = getComputedStyle(document.documentElement);
-  return [css.getPropertyValue('--accent').trim() || '#8b7cff', css.getPropertyValue('--text').trim() || '#e8e9f0'];
+  return [css.getPropertyValue('--accent').trim() || '#f5a623', css.getPropertyValue('--text').trim() || '#ededed'];
 };
 import { CONTRACT_ADDRESSES, ERC20_ABI, ROUTER_ABI, PAYROLL_ABI, VAULT_ABI, NETWORK_CONFIG } from '../config/contracts';
 import { ethers } from 'ethers';

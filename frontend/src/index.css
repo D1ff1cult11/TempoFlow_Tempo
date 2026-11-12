@@ -8,30 +8,8 @@
   Status colors (--success, --danger, --warning) are separate and only used for state.
 */
 
-:root,
-[data-theme='indigo'] {
-  /* A · Midnight indigo (Linear / Stripe dark) */
-  --bg: #0e1015;
-  --surface: #161922;
-  --surface-2: #1d2130;
-  --surface-3: #252a3b;
-  --border: #262a37;
-  --border-strong: #353a4c;
-  --text: #e8e9f0;
-  --text-muted: #9a9db0;
-  --text-faint: #6b7086;
-  --accent: #8b7cff;
-  --accent-hover: #9d90ff;
-  --accent-ink: #0e1015;
-  --accent-text: #b8afff;
-  --success: #4cc38a;
-  --danger: #f2555a;
-  --warning: #e8b45a;
-  color-scheme: dark;
-}
-
-[data-theme='amber'] {
-  /* C · Graphite amber (Vercel / Raycast) */
+:root {
+  /* Graphite amber */
   --bg: #0f0f10;
   --surface: #18181b;
   --surface-2: #202024;
@@ -119,13 +97,6 @@ a { color: inherit; }
 .topbar { display: none; }
 .bottom-nav { display: none; }
 
-.theme-switch { display: flex; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 3px; gap: 3px; }
-.theme-switch button {
-  flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 5px 6px; border: none; border-radius: 4px;
-  background: transparent; color: var(--text-muted); font: inherit; font-size: 0.75rem; font-weight: 500; cursor: pointer;
-}
-.theme-switch button[aria-pressed='true'] { background: var(--surface-3); color: var(--text); }
-.swatch { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
 
 /* ---------- Surfaces ---------- */
 .glass-panel, .card {

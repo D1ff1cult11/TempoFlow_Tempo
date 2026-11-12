@@ -1,7 +1,6 @@
 import React from 'react';
 import { Zap, LayoutDashboard, Bot, Users, BookOpen, ArrowRightLeft, FlaskConical, Github } from 'lucide-react';
 import { useWorkspace } from '../../store/useWorkspace';
-import { THEMES, useTheme, setTheme } from '../../lib/theme';
 import { short } from '../../lib/tempo';
 
 export const PAGES = [
@@ -24,19 +23,11 @@ function Brand() {
   );
 }
 
-function ThemeSwitch() {
-  const theme = useTheme();
-  return (
-    <div className="theme-switch" role="group" aria-label="Color theme">
-      {THEMES.map((t) => (
-        <button key={t.id} aria-pressed={theme === t.id} title={t.name} onClick={() => setTheme(t.id)}>
-          <span className="swatch" style={{ background: t.swatch }} />
-          {t.label}
-        </button>
-      ))}
-    </div>
-  );
-}
+const NetworkBadge = () => (
+  <span className="badge-pill badge-emerald" style={{ alignSelf: 'flex-start' }}>
+    <span className="pulse-dot" /> Tempo testnet
+  </span>
+);
 
 function NavButton({ page, current, onNavigate }) {
   const Icon = page.icon;
@@ -63,11 +54,8 @@ export function AppShell({ page, onNavigate, children }) {
           <NavButton key={p.id} page={p} current={page} onNavigate={onNavigate} />
         ))}
         <div className="sidebar-footer">
-          <span className="badge-pill badge-emerald" style={{ alignSelf: 'flex-start' }}>
-            <span className="pulse-dot" /> Tempo testnet
-          </span>
+          <NetworkBadge />
           {ws.company && <span className="cp-mono" style={{ color: 'var(--text-muted)' }}>{short(ws.company.address)}</span>}
-          <ThemeSwitch />
           <a
             className="cp-link"
             href="https://github.com/D1ff1cult11/TempoFlow_Tempo"
@@ -83,7 +71,7 @@ export function AppShell({ page, onNavigate, children }) {
       <div className="main">
         <header className="topbar">
           <Brand />
-          <ThemeSwitch />
+          <NetworkBadge />
         </header>
         {children}
         <nav className="bottom-nav" aria-label="Main">

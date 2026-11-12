@@ -68,7 +68,7 @@ need on top: teams, caps, a ledger that joins agents and people, alerts and expo
 npm run frontend:dev
 ```
 Open the app, create a company account (passkey or test key), click **Get testnet funds**, then add an agent.
-Use the theme switch in the sidebar to compare the two color themes (Indigo and Amber).
+The UI uses one dark "graphite amber" theme on a 60/30/10 color system (see `frontend/src/index.css`).
 
 ### Fee sponsorship (optional)
 Locally, run the relay next to the app. `--throwaway` uses a fresh in-memory testnet key funded by the faucet:
@@ -103,7 +103,7 @@ npx hardhat test
 | `frontend/src/store/useWorkspace.js` | Workspace state (company, teams, agents, people) and the team-cap rule |
 | `frontend/src/components/control/` | Control panel screens (Overview, Agents, People, Ledger, Treasury) |
 | `frontend/src/components/layout/` | Sidebar app shell, bottom navigation on phones, theme switch |
-| `frontend/src/index.css` | Design tokens: 60/30/10 color system, two themes |
+| `frontend/src/index.css` | Design tokens: 60/30/10 color system (graphite amber) |
 | `api/` | Vercel serverless fee-payer relay |
 | `frontend/scripts/` | Testnet smoke tests |
 | `contracts/` | `TempoFlowRouter`, `TempoPayrollStream`, `MerchantSettlementVault` (+ mocks) |
