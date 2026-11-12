@@ -150,11 +150,11 @@ export function DemoBanner() {
           <button
             onClick={() => simulateSolanaPayment(50.0)}
             disabled={relayerStep !== 'IDLE'}
-            className="btn-action-solana"
+            className="btn-primary"
             style={{ fontSize: '0.82rem', padding: '8px 14px' }}
           >
             <Send size={14} />
-            {relayerStep === 'IDLE' ? '1. Simulate $50 Solana Pay' : 'Processing Settlement...'}
+            {relayerStep === 'IDLE' ? '1. Simulate a $50 customer payment' : 'Processing Settlement...'}
           </button>
 
           <button

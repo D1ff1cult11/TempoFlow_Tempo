@@ -5,7 +5,7 @@ import { Store, QrCode, ArrowDownRight, RefreshCw, CheckCircle, ExternalLink, Za
 
 export function MerchantTerminal() {
   const [posAmount, setPosAmount] = useState('50.00');
-  const [qrTab, setQrTab] = useState('SOLANA'); // 'SOLANA' | 'TEMPO'
+  const [qrTab, setQrTab] = useState('TEMPO');
   const [qrDataUrl, setQrDataUrl] = useState('');
   const qrCanvasRef = useRef(null);
 
@@ -24,15 +24,13 @@ export function MerchantTerminal() {
 
   // Generate real dynamic QR code whenever amount or tab changes
   useEffect(() => {
-    const payload = qrTab === 'SOLANA'
-      ? `solana:TempoF1owIngress111111111111111111111111111?amount=${posAmount}&spl-token=EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v&reference=TEMPO-${Date.now()}`
-      : `ethereum:0x0165878A594ca255338adfa4d48449f69242Eb8F@4242?value=${posAmount}&token=USDC`;
+    const payload = `ethereum:0x0165878A594ca255338adfa4d48449f69242Eb8F@42431?value=${posAmount}&token=USDC`;
 
     QRCode.toDataURL(payload, {
       width: 180,
       margin: 1,
       color: {
-        dark: qrTab === 'SOLANA' ? '#9945FF' : '#00D26A',
+        dark: '#00D26A',
         light: '#07090E',
       },
     })
@@ -63,7 +61,7 @@ export function MerchantTerminal() {
                 Merchant Point-of-Sale
               </h3>
               <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
-                Accept stablecoin payments on Tempo (Solana intake simulated)
+                Accept stablecoin payments on Tempo (simulated)
               </p>
             </div>
           </div>
@@ -189,22 +187,6 @@ export function MerchantTerminal() {
         }}>
           <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', marginBottom: '12px' }}>
             <button
-              onClick={() => setQrTab('SOLANA')}
-              style={{
-                padding: '4px 12px',
-                borderRadius: '6px',
-                border: 'none',
-                cursor: 'pointer',
-                fontSize: '0.75rem',
-                fontWeight: 700,
-                background: qrTab === 'SOLANA' ? 'rgba(153, 69, 255, 0.25)' : 'transparent',
-                color: qrTab === 'SOLANA' ? '#C084FC' : 'var(--text-muted)',
-                borderBottom: qrTab === 'SOLANA' ? '2px solid #9945FF' : '2px solid transparent',
-              }}
-            >
-              Solana Pay (Phantom)
-            </button>
-            <button
               onClick={() => setQrTab('TEMPO')}
               style={{
                 padding: '4px 12px',
@@ -237,7 +219,7 @@ export function MerchantTerminal() {
         {!isDemoMode && !connectedAddress ? (
           <button
             onClick={connectWallet}
-            className="btn-action-solana"
+            className="btn-primary"
             style={{ width: '100%', justifyContent: 'center', padding: '12px' }}
           >
             <Zap size={18} />

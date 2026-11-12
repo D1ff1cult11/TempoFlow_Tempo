@@ -38,8 +38,8 @@ let state = {
     {
       id: 'tx-init-1',
       hash: '0x9a8f...3c21',
-      type: 'Solana Pay Ingress',
-      from: 'Solana: 7Yv...92x',
+      type: 'Customer Payment (simulated)',
+      from: 'Customer: 0x7Yv...92x',
       to: 'Tempo: Merchant Vault',
       amountIn: '50.00 USDC',
       amountOut: '45.95 EURC (FX 0.92)',
@@ -146,8 +146,8 @@ export function useTempoStore() {
     const newTx = {
       id: 'tx-' + Date.now(),
       hash: orderHash,
-      type: 'Solana Payment (simulated)',
-      from: 'Phantom: 8Hq...41m',
+      type: 'Customer Payment (simulated)',
+      from: 'Customer: 0x8Hq...41m',
       to: 'Tempo: Merchant Vault',
       amountIn: `${amount.toFixed(2)} USDC`,
       amountOut: `${finalAmount.toFixed(2)} ${tokenSymbol} ${isFX ? '(mock FX rate)' : ''}`,
@@ -396,7 +396,7 @@ export function useTempoStore() {
       const accounts = await provider.send('eth_requestAccounts', []);
       state.connectedAddress = accounts[0];
 
-      // Attempt to switch to Tempo Testnet (4242)
+      // Attempt to switch to Tempo Testnet (Moderato, 42431)
       try {
         await window.ethereum.request({
           method: 'wallet_switchEthereumChain',
@@ -523,7 +523,7 @@ export function useTempoStore() {
         id: 'tx-' + Date.now(),
         hash: receipt.hash.slice(0, 10) + '...' + receipt.hash.slice(-6),
         fullHash: receipt.hash,
-        explorerUrl: `https://explorer.testnet.tempo.xyz/tx/${receipt.hash}`,
+        explorerUrl: `https://explore.testnet.tempo.xyz/tx/${receipt.hash}`,
         type: 'Tempo (On-Chain)',
         from: state.connectedAddress.slice(0, 6) + '...' + state.connectedAddress.slice(-4),
         to: 'Merchant Vault (' + CONTRACT_ADDRESSES.MerchantSettlementVault.slice(0, 6) + '...)',

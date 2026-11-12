@@ -17,9 +17,9 @@ module.exports = {
       chainId: 31337,
     },
     tempoTestnet: {
-      url: process.env.TEMPO_TESTNET_RPC || "https://testnet.tempo.xyz/rpc",
+      url: process.env.TEMPO_TESTNET_RPC || "https://rpc.moderato.tempo.xyz",
       accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
-      chainId: 4242,
+      chainId: 42431, // Tempo testnet (Moderato)
     },
   },
   paths: {

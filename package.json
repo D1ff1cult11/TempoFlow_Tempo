@@ -1,7 +1,7 @@
 {
   "name": "tempoflow-protocol",
   "version": "1.0.0",
-  "description": "TempoFlow: The Sub-Second Programmable Stablecoin Highway on Tempo L1 & Solana Ingress",
+  "description": "TempoFlow: one stablecoin treasury for people and AI agents on Tempo",
   "main": "index.js",
   "scripts": {
     "compile": "hardhat compile",
@@ -12,13 +12,14 @@
   },
   "keywords": [
     "tempo",
-    "solana",
+    "ai-agents",
+    "payroll",
     "stablecoins",
     "streaming-payments",
     "evm",
     "defi"
   ],
-  "author": "TempoFlow Core Team",
+  "author": "TempoFlow",
   "license": "MIT",
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^5.0.0",

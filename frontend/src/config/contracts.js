@@ -2,20 +2,16 @@
 
 export const NETWORK_CONFIG = {
   tempoTestnet: {
-    chainId: '0x1092', // 4242 in hex
-    chainIdDecimal: 4242,
-    chainName: 'Tempo L1 Testnet',
+    chainId: '0xa5bf', // 42431 in hex
+    chainIdDecimal: 42431,
+    chainName: 'Tempo Testnet (Moderato)',
     nativeCurrency: {
-      name: 'USD Coin',
-      symbol: 'USDC',
+      name: 'USD',
+      symbol: 'USD',
       decimals: 6,
     },
-    rpcUrls: ['https://testnet.tempo.xyz/rpc'],
-    blockExplorerUrls: ['https://explorer.testnet.tempo.xyz'],
-  },
-  solanaDevnet: {
-    cluster: 'devnet',
-    endpoint: 'https://api.devnet.solana.com',
+    rpcUrls: ['https://rpc.moderato.tempo.xyz'],
+    blockExplorerUrls: ['https://explore.testnet.tempo.xyz'],
   },
 };
 
@@ -30,7 +26,6 @@ export const CONTRACT_ADDRESSES = {
   TempoPayrollStream: '0xa513E6E4b8f2a923D98304ec87F64353C4D5C853',
   // MerchantSettlementVault is deployed per-merchant; this is the default demo vault
   MerchantSettlementVault: '0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9',
-  SolanaIngressProgramId: 'TempoF1owIngress111111111111111111111111111',
 };
 
 export const ERC20_ABI = [
