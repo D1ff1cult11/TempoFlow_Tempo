@@ -1,9 +1,9 @@
 # ⚡ TempoFlow
 
-> **Stablecoin payments, streaming payroll and merchant settlement on [Tempo](https://tempo.xyz).**
+> **One stablecoin treasury for your people and your AI agents, on [Tempo](https://tempo.xyz).**
 
 [![Live Demo](https://img.shields.io/badge/Demo-tempoflow--app.vercel.app-00F0FF?style=for-the-badge&logo=vercel)](https://tempoflow-app.vercel.app/)
-[![Solidity](https://img.shields.io/badge/Solidity-0.8.24-363636?logo=solidity)](https://soliditylang.org/)
+[![Network](https://img.shields.io/badge/Tempo-testnet%20(Moderato)-00D26A)](https://explore.testnet.tempo.xyz)
 [![Status](https://img.shields.io/badge/Status-Early%20prototype-orange)](#-project-status)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
@@ -11,113 +11,98 @@
   <img src="assets/tempoflow_hero_banner.jpg" alt="TempoFlow" width="100%" style="border-radius: 12px;" />
 </p>
 
-TempoFlow is a set of smart contracts and a web app for moving stablecoins on Tempo:
+Companies now pay two kinds of workers: **people** (contractors around the world) and **AI agents** (that buy APIs,
+data, compute and services on their own). TempoFlow is the control panel for both, from one treasury:
 
-- **Payments & settlement**: a router that takes a stablecoin payment, charges a 10 bps protocol fee, optionally converts currency (e.g. USDC → EURC), and pays the merchant, with replay protection and an emergency pause.
-- **Streaming payroll**: an employer locks funds into a stream and the employee's balance accrues every second; they can withdraw what has accrued at any time, and cancelling splits the balance fairly.
-- **Merchant vaults**: non-custodial, multi-token balances for a merchant, with optional automatic revenue splits to another address.
-- **Solana payment intake (experimental)**: an Anchor program where a payer escrows SPL tokens for a payment destined for Tempo, with a refund after a 1-hour timeout.
+- **Agent budgets**: give every agent its own key with a daily limit, an allowed-payee list and an expiry. **Tempo
+  enforces these rules on-chain** (access keys), so a buggy or compromised agent cannot overspend. Revoke any agent, or a
+  whole team, in one click.
+- **Team caps**: group agents into teams; TempoFlow keeps the sum of agent limits in a team under the team's daily cap.
+- **Pay runs for people**: pay every contractor in **one Tempo transaction** (batched calls). Each payout carries its
+  invoice number as an on-chain **memo**.
+- **One ledger**: rebuilt from the chain (memo transfers + `AccessKeySpend` events): who spent what, for which task or
+  invoice, by team. Export to CSV for your accountant.
+- **Fee sponsorship**: network fees can be paid by a sponsor, so fees never eat an agent's budget.
+- **Real FX**: convert between stablecoins with live quotes from Tempo's built-in Stablecoin DEX.
 
----
-
-## 🚦 Project Status
-
-This is an **early prototype**. Be clear about what is real and what isn't:
+## 🚦 Project status
 
 | Area | Status |
 | :--- | :--- |
-| EVM contracts (`TempoFlowRouter`, `TempoPayrollStream`, `MerchantSettlementVault`) | ✅ Written and covered by a local Hardhat test suite (10 tests) |
-| Deployment to Tempo (testnet or mainnet) | ❌ **Not deployed yet.** See [`deployments/`](deployments/README.md) |
-| Currency conversion (FX) | 🟡 **Mocked.** `contracts/mocks/MockEnshrinedAMM.sol` uses a fixed, admin-set rate; not yet wired to Tempo's real FX |
-| Stablecoins | 🟡 **Mocked** in tests and local deploys (`MockERC20`, 6 decimals) |
-| Solana Anchor program | 🟡 Code only. Not deployed; program ID is a placeholder |
-| Solana → Tempo relayer | ❌ Not built. The app only simulates this step |
-| Security audit | ❌ None. Do not use with real funds |
-| Web app | ✅ Runs in **Demo Mode** (fully simulated in the browser, no wallet needed). **Live Web3 Mode** needs real deployed contract addresses, which don't exist yet |
+| Agent budgets: authorize, live remaining limit, change limit, revoke, team caps | ✅ **Live on Tempo testnet** (`viem/tempo` access keys) |
+| Pay runs: batched transfers with invoice memos | ✅ **Live on Tempo testnet** |
+| Ledger rebuilt from chain + CSV export | ✅ **Live on Tempo testnet** |
+| Stablecoin conversion via the Stablecoin DEX | ✅ **Live on Tempo testnet** |
+| Fee sponsorship | 🟡 Works on testnet with a **browser-held demo sponsor key**. Production needs a server-side fee payer |
+| Company account | 🟡 Passkey (WebAuthn) or a throwaway test key, stored in your browser. Testnet only |
+| Agent keys | 🟡 Kept in the browser for testing. In production they live in the agent's own runtime |
+| Pooled team budgets enforced on-chain | ❌ Not possible natively today (Tempo limits are per key). See [ROADMAP](ROADMAP.md) |
+| Cash-out to local bank accounts / compliance | ❌ Planned through a licensed partner. Not built |
+| Streaming payroll, merchant router and vault contracts | 🟡 Written and tested locally (10 Hardhat tests); **not deployed**. Shown as simulated demos |
+| Mainnet | ❌ Not used. Do not use with real funds; nothing is audited |
 
----
-
-## 🏛️ Architecture
+## 🏛️ How it works
 
 ```
-┌────────────────────────────────────────────────────────┐
-│        Solana payment intake (Anchor, experimental)    │
-│  • Payer escrows SPL tokens in a program PDA           │
-│  • Refund available after a 1-hour timeout             │
-│  • Emits a payment intent with the Tempo (EVM) address │
-└───────────────────────────┬────────────────────────────┘
-                            │ relayer (not built yet)
-                            ▼
-┌───────────────────────────────────────────────────────────────────────────┐
-│                             Tempo (EVM)                                   │
-│                                                                           │
-│  ┌───────────────────────────┐      ┌──────────────────────────────────┐  │
-│  │    TempoFlowRouter        │─────►│  FX conversion                   │  │
-│  │  • 10 bps protocol fee    │      │  (MockEnshrinedAMM for now)      │  │
-│  │  • Replay protection      │      └──────────────────────────────────┘  │
-│  │  • Emergency pause        │                                            │
-│  └─────────────┬─────────────┘                                            │
-│                ▼                                                          │
-│  ┌───────────────────────────┐      ┌──────────────────────────────────┐  │
-│  │  MerchantSettlementVault  │      │       TempoPayrollStream         │  │
-│  │  • Non-custodial balances │      │  • Per-second linear accrual     │  │
-│  │  • Auto-split forwarding  │      │  • Withdraw any time             │  │
-│  └───────────────────────────┘      │  • Fair cancellation             │  │
-│                                     └──────────────────────────────────┘  │
-└───────────────────────────────────────────────────────────────────────────┘
+                 ┌───────────────────────── TempoFlow web app ─────────────────────────┐
+                 │  Agents · Teams · People · Ledger · Treasury                         │
+                 └──────────────┬───────────────────────────────┬──────────────────────┘
+                                │ viem/tempo                    │ reads events
+                                ▼                               ▼
+┌──────────────────────────────────── Tempo (testnet: Moderato, chain 42431) ───────────────────────────────┐
+│  Company account (passkey or test key)                                                                   │
+│   ├─ Account Keychain: one access key per agent → daily limit · allowed recipients · expiry · revoke     │
+│   ├─ TIP-20 transferWithMemo: every payment tagged with an agent/task or invoice memo                    │
+│   ├─ Tempo transactions: batched calls (pay runs) · fee payer (sponsorship)                              │
+│   └─ Stablecoin DEX: live quotes and swaps between stablecoins                                           │
+└──────────────────────────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
-Network-level features such as paying gas in stablecoins and fast finality come from **Tempo itself**, not from TempoFlow.
+TempoFlow adds no new contract for budgets: the protocol already enforces them. TempoFlow is the layer that companies
+need on top: teams, caps, a ledger that joins agents and people, alerts and export.
 
----
+## ⚡ Getting started
 
-## 📦 Contracts
+### Web app
+```bash
+npm run frontend:dev
+```
+Open the app, create a company account (passkey or test key), click **Get testnet funds**, then add an agent.
 
-| Contract | Purpose |
-| :--- | :--- |
-| `contracts/TempoFlowRouter.sol` | Payment routing, 10 bps fee, optional FX, split payments, replay guard, pause |
-| `contracts/TempoPayrollStream.sol` | Per-second payroll streams: create, withdraw, cancel |
-| `contracts/MerchantSettlementVault.sol` | Merchant balances, withdrawals, auto-forward splits |
-| `contracts/mocks/MockEnshrinedAMM.sol` | Test stand-in for FX conversion (fixed rates) |
-| `contracts/mocks/MockERC20.sol` | Test stablecoins (USDC/EURC, 6 decimals) |
-| `solana-ingress/` | Anchor program for Solana-side escrow (experimental, not deployed) |
+### End-to-end smoke tests against Tempo testnet
+Each run creates throwaway keys and uses faucet funds only.
+```bash
+cd frontend
+node scripts/smoke-agent-budget.mjs   # authorize agent, pay with memo, overspend blocked, revoke
+node scripts/smoke-payrun.mjs         # 3 payouts in 1 sponsored transaction, DEX quote + swap
+```
 
----
-
-## ⚡ Getting Started
-
-### Run the contract tests
+### Contracts (streaming payroll, merchant router, vault)
 ```bash
 npm install
 npx hardhat test
 ```
+`hardhat.config.cjs` has a `tempoTestnet` network (Moderato, chain 42431). Nothing is deployed yet; see
+[`deployments/`](deployments/README.md).
 
-### Deploy locally
-```bash
-npx hardhat node
-# in a second terminal:
-npx hardhat run scripts/deploy.js --network localhost
-```
-This writes `deployments/localhost.json`. A `tempoTestnet` network is configured in `hardhat.config.cjs` (set `TEMPO_TESTNET_RPC` and `PRIVATE_KEY` in your environment) but has not been used for a real deployment yet.
+## 📦 Repository layout
 
-### Run the web app
-```bash
-npm run frontend:dev
-```
-The app opens in **Demo Mode**: payments, payroll and FX are simulated in the browser. **Live Web3 Mode** connects a wallet, but it will only work once contract addresses in `frontend/src/config/contracts.js` point at a real deployment.
+| Path | What |
+| :--- | :--- |
+| `frontend/src/lib/tempo.js` | All Tempo calls: accounts, access keys, memos, pay runs, DEX, event history |
+| `frontend/src/store/useWorkspace.js` | Workspace state (company, teams, agents, people) and the team-cap rule |
+| `frontend/src/components/control/` | Control panel screens |
+| `frontend/scripts/` | Testnet smoke tests |
+| `contracts/` | `TempoFlowRouter`, `TempoPayrollStream`, `MerchantSettlementVault` (+ mocks) |
+| `archive/` | Parked code (Solana intake) |
+| `ROADMAP.md` | What's next and how work is tracked |
 
----
+## 🔒 Security notes
 
-## 🔒 Security Notes
-
-Design measures in the contracts (not audited):
-- Checks-Effects-Interactions ordering on state changes
-- Reentrancy lock on external entry points
-- On-chain order IDs to prevent a payment being executed twice
-- Owner-controlled emergency pause
-- Solana escrow refund after a 1-hour timeout
-
----
+- Testnet only. Keys in this prototype are stored in the browser's localStorage for convenience.
+- Never give an agent an admin key: TempoFlow only creates limited, scoped, expiring keys.
+- Contracts use checks-effects-interactions, a reentrancy lock, replay protection and an emergency pause, but are not
+  audited.
 
 ## 📄 License
 MIT. See [LICENSE](LICENSE).
