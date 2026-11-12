@@ -8,8 +8,8 @@ const STORAGE_KEY = 'tempoflow.workspace.v1';
 
 const EMPTY = {
   company: null, // { type: 'passkey' | 'testKey', address, credential? , privateKey? }
-  sponsor: null, // testnet stand-in for the fee-payer service
-  sponsorFees: true,
+  sponsorFees: true, // use the server fee-payer relay when it is available
+  relayReady: false, // not persisted in practice: refreshed on load
   teams: [
     { id: 'team-research', name: 'Research', dailyCap: 50 },
     { id: 'team-ops', name: 'Operations', dailyCap: 30 },
@@ -22,7 +22,9 @@ const EMPTY = {
 function load() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? { ...EMPTY, ...JSON.parse(raw) } : { ...EMPTY };
+    if (!raw) return { ...EMPTY };
+    const { sponsor, ...saved } = JSON.parse(raw); // drop the old browser-held sponsor key
+    return { ...EMPTY, ...saved, relayReady: false };
   } catch {
     return { ...EMPTY };
   }
@@ -54,6 +56,9 @@ export function useWorkspace() {
   return useSyncExternalStore(subscribe, () => state);
 }
 
+/** Sponsorship is on only when the person wants it AND the server relay is configured. */
+export const sponsoring = () => Boolean(state.sponsorFees && state.relayReady);
+
 const uid = (p) => `${p}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`;
 
 export function log(entry) {
@@ -82,19 +87,22 @@ export function checkTeamCap(s, teamId, dailyLimit, excludeAgentId) {
 export const actions = {
   async createCompany(kind) {
     const company = kind === 'passkey' ? await T.createPasskeyCompany('TempoFlow company (testnet)') : T.createTestKeyCompany();
-    set({ company, sponsor: state.sponsor ?? T.createSponsor() });
+    set({ company });
     log({ kind: 'setup', label: `Company account created (${kind === 'passkey' ? 'passkey' : 'test key'})` });
     return company;
   },
 
   async fund() {
-    const targets = [state.company?.address, state.sponsor?.address].filter(Boolean);
-    for (const a of targets) await T.fundFromFaucet(a);
-    log({ kind: 'setup', label: 'Funded company and fee sponsor from the testnet faucet' });
+    await T.fundFromFaucet(state.company.address);
+    log({ kind: 'setup', label: 'Funded the company account from the testnet faucet' });
   },
 
   setSponsorFees(on) {
     set({ sponsorFees: on });
+  },
+
+  async checkRelay() {
+    set({ relayReady: await T.relayAvailable() });
   },
 
   addTeam(name, dailyCap) {
@@ -166,7 +174,7 @@ export const actions = {
       to,
       amount,
       memo,
-      sponsor: state.sponsorFees ? state.sponsor : undefined,
+      sponsored: sponsoring(),
     });
     log({ kind: 'agent-spend', label: `Agent "${agent.name}" paid ${T.short(to)}`, amount: Number(amount), token: agent.token, hash, memo });
     return hash;
@@ -188,7 +196,7 @@ export const actions = {
       name: c.name,
     }));
     if (!lines.length) throw new Error('Add at least one contractor');
-    const hash = await T.payRun({ company: state.company, lines, token, sponsor: state.sponsorFees ? state.sponsor : undefined });
+    const hash = await T.payRun({ company: state.company, lines, token, sponsored: sponsoring() });
     const total = lines.reduce((s, l) => s + Number(l.amount), 0);
     lines.forEach((l) => log({ kind: 'payroll', label: `Paid ${l.name}`, amount: Number(l.amount), token, hash, memo: l.memo }));
     log({ kind: 'payroll', label: `Pay run ${period}: ${lines.length} people in 1 transaction (${T.usd(total)})`, hash });

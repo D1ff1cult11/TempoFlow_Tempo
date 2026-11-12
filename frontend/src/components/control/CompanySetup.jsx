@@ -66,8 +66,7 @@ export function CompanySetup() {
             <Building2 size={18} /> Company treasury <span className="badge-pill badge-cyan">Tempo testnet</span>
           </div>
           <p className="cp-sub">
-            Account <AddressLink address={ws.company.address} /> · {ws.company.type === 'passkey' ? 'passkey' : 'test key'} ·
-            fee sponsor <AddressLink address={ws.sponsor?.address} />
+            Account <AddressLink address={ws.company.address} /> · {ws.company.type === 'passkey' ? 'passkey' : 'test key'}
           </p>
         </div>
         <div className="cp-row">
@@ -92,10 +91,22 @@ export function CompanySetup() {
           <Stat key={t.address} label={t.symbol} value={balances ? balances[t.address].toLocaleString() : '…'} />
         ))}
       </div>
-      <label className="cp-row" style={{ fontSize: '0.82rem', color: 'var(--text-muted)', cursor: 'pointer' }}>
-        <input type="checkbox" checked={ws.sponsorFees} onChange={(e) => actions.setSponsorFees(e.target.checked)} />
-        Sponsor network fees for agents and pay runs (so fees never eat an agent's budget)
-      </label>
+      {ws.relayReady ? (
+        <label className="cp-row" style={{ fontSize: '0.82rem', color: 'var(--text-muted)', cursor: 'pointer' }}>
+          <input
+            type="checkbox"
+            checked={ws.sponsorFees}
+            onChange={(e) => actions.setSponsorFees(e.target.checked)}
+            style={{ accentColor: 'var(--accent)' }}
+          />
+          TempoFlow pays network fees for agents and pay runs, so fees never eat an agent's budget
+        </label>
+      ) : (
+        <div className="cp-note">
+          Fee sponsorship is off: this deployment has no sponsor configured. Agents and pay runs pay their own small
+          network fees, which count against an agent's budget.
+        </div>
+      )}
       <Result result={result} okText="Funded from the testnet faucet." />
     </div>
   );

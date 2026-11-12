@@ -13,7 +13,7 @@ import {
 } from 'viem';
 import { tempoModerato } from 'viem/chains';
 import { generatePrivateKey } from 'viem/accounts';
-import { Account, Abis, Actions, Addresses, Expiry, P256, WebAuthnP256, tempoActions } from 'viem/tempo';
+import { Account, Abis, Actions, Addresses, Expiry, P256, WebAuthnP256, tempoActions, withFeePayer } from 'viem/tempo';
 
 export const CHAIN = tempoModerato;
 export const EXPLORER = tempoModerato.blockExplorers.default.url;
@@ -34,6 +34,25 @@ export const client = createClient({ chain: tempoModerato, transport: http() })
   .extend(publicActions)
   .extend(walletActions)
   .extend(tempoActions());
+
+// Fee sponsorship goes through TempoFlow's server relay (/api/relay). The sponsor key lives only on the server.
+export const RELAY_URL = import.meta.env?.VITE_RELAY_URL || '/api/relay';
+const relayHttp = () => http(new URL(RELAY_URL, globalThis.location?.origin ?? 'http://localhost').toString());
+export const sponsoredClient = createClient({ chain: tempoModerato, transport: withFeePayer(http(), relayHttp()) })
+  .extend(publicActions)
+  .extend(walletActions)
+  .extend(tempoActions());
+
+/** True when the server relay is deployed and has a sponsor key configured. */
+export async function relayAvailable() {
+  try {
+    const r = await fetch(RELAY_URL, { method: 'GET' });
+    if (!r.ok) return false;
+    return Boolean((await r.json()).sponsored);
+  } catch {
+    return false;
+  }
+}
 
 // ---------- formatting ----------
 export const short = (a = '') => (a ? `${a.slice(0, 6)}…${a.slice(-4)}` : '');
@@ -82,14 +101,6 @@ export function companyAccount(company) {
   if (company.type === 'passkey') return Account.fromWebAuthnP256(company.credential);
   return Account.fromSecp256k1(company.privateKey);
 }
-
-// Testnet stand-in for TempoFlow's fee-payer service. In production this key lives on a server
-// (viem/tempo `withFeePayer` transport) and is never in the browser.
-export function createSponsor() {
-  const privateKey = generatePrivateKey();
-  return { privateKey, address: Account.fromSecp256k1(privateKey).address };
-}
-export const sponsorAccount = (sponsor) => (sponsor ? Account.fromSecp256k1(sponsor.privateKey) : undefined);
 
 export async function fundFromFaucet(address) {
   return client.faucet.fundSync({ account: address });
@@ -157,28 +168,28 @@ export async function remainingLimit({ companyAddress, agent }) {
 }
 
 /** The agent itself pays, signing with its own access key. With a sponsor, the fee does not eat the agent's budget. */
-export async function agentPay({ companyAddress, agent, to, amount, memo, sponsor }) {
-  const result = await client.token.transferSync({
+export async function agentPay({ companyAddress, agent, to, amount, memo, sponsored }) {
+  const result = await (sponsored ? sponsoredClient : client).token.transferSync({
     account: agentAccount(agent, companyAddress),
     token: agent.token,
     to,
     amount: toUnits(amount),
     memo: encodeMemo(memo),
-    ...(sponsor ? { feePayer: sponsorAccount(sponsor) } : {}),
+    ...(sponsored ? { feePayer: true } : {}),
   });
   return result.receipt.transactionHash;
 }
 
 // ---------- people (batched pay run) ----------
 /** Pays every line in ONE Tempo transaction; each transfer carries its own memo (invoice ID). */
-export async function payRun({ company, lines, token, sponsor }) {
+export async function payRun({ company, lines, token, sponsored }) {
   const calls = lines.map((l) =>
     Actions.token.transfer.call({ token, to: l.address, amount: toUnits(l.amount), memo: encodeMemo(l.memo) }),
   );
-  const receipt = await client.sendTransactionSync({
+  const receipt = await (sponsored ? sponsoredClient : client).sendTransactionSync({
     account: companyAccount(company),
     calls,
-    ...(sponsor ? { feePayer: sponsorAccount(sponsor) } : {}),
+    ...(sponsored ? { feePayer: true } : {}),
   });
   if (receipt.status !== 'success') throw new Error('Pay run transaction reverted');
   return receipt.transactionHash;

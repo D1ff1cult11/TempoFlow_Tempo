@@ -6,6 +6,8 @@ export default defineConfig({
   server: {
     port: 5173,
     open: false,
+    // /api/relay is a Vercel function in production; locally run: node ../scripts/relay-dev.mjs
+    proxy: { '/api': 'http://localhost:8787' },
   },
   build: {
     outDir: 'dist',
