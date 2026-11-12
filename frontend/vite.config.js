@@ -17,6 +17,7 @@ export default defineConfig({
           'ethers-vendor': ['ethers'],
           'lucide-vendor': ['lucide-react'],
           'confetti-vendor': ['canvas-confetti'],
+          'viem-vendor': ['viem'],
         },
       },
     },
