@@ -105,6 +105,7 @@ npx hardhat test
 | `frontend/src/components/layout/` | Sidebar app shell, bottom navigation on phones, theme switch |
 | `frontend/src/index.css` | Design tokens: 60/30/10 color system (graphite amber) |
 | `api/` | Vercel serverless fee-payer relay |
+| `packages/agent-sdk/` | `@tempoflow/agent`: what an agent runs to pay, check its budget and call paid (MPP) APIs |
 | `frontend/scripts/` | Testnet smoke tests |
 | `contracts/` | `TempoFlowRouter`, `TempoPayrollStream`, `MerchantSettlementVault` (+ mocks) |
 | `archive/` | Parked code (Solana intake) |

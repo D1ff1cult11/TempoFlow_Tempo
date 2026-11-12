@@ -130,14 +130,16 @@ export const agentAccount = (agent, companyAddress) => Account.fromP256(agent.pr
  * Tempo enforces: daily `limit` of `token`, only `transferWithMemo`, only to `recipients`, until `expiryDays`.
  */
 export async function authorizeAgent({ company, agent }) {
-  const scope = { address: agent.token, selector: 'transferWithMemo(address,uint256,bytes32)' };
-  if (agent.recipients?.length) scope.recipients = agent.recipients;
+  const withRecipients = (s) => (agent.recipients?.length ? { ...s, recipients: agent.recipients } : s);
+  const scopes = [withRecipients({ address: agent.token, selector: 'transferWithMemo(address,uint256,bytes32)' })];
+  // Paid APIs over MPP settle with a plain TIP-20 transfer, so the key needs that call too.
+  if (agent.allowMpp) scopes.push(withRecipients({ address: agent.token, selector: 'transfer(address,uint256)' }));
   const result = await client.accessKey.authorizeSync({
     account: companyAccount(company),
     accessKey: { accessKeyAddress: agent.keyAddress, keyType: 'p256' },
     expiry: Expiry.days(Number(agent.expiryDays || 30)),
     limits: [{ token: agent.token, limit: toUnits(agent.dailyLimit), period: 86_400 }],
-    scopes: [scope],
+    scopes,
   });
   const receipt = result.receipt ?? result;
   return { hash: receipt.transactionHash, blockNumber: receipt.blockNumber };

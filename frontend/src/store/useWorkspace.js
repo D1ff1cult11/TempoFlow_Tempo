@@ -115,7 +115,7 @@ export const actions = {
     set((s) => ({ teams: s.teams.map((t) => (t.id === teamId ? { ...t, dailyCap: Number(dailyCap) } : t)) }));
   },
 
-  async addAgent({ name, teamId, token, dailyLimit, recipients, expiryDays }) {
+  async addAgent({ name, teamId, token, dailyLimit, recipients, expiryDays, allowMpp }) {
     const problem = checkTeamCap(state, teamId, dailyLimit);
     if (problem) throw new Error(problem);
     const key = T.newAgentKey(state.company.address);
@@ -127,6 +127,7 @@ export const actions = {
       dailyLimit: Number(dailyLimit),
       recipients,
       expiryDays: Number(expiryDays),
+      allowMpp: Boolean(allowMpp),
       ...key,
       status: 'pending',
       createdAt: Date.now(),

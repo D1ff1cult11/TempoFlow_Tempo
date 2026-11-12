@@ -117,6 +117,7 @@ function NewAgentCard() {
     dailyLimit: '10',
     recipients: '',
     expiryDays: '30',
+    allowMpp: false,
   });
   const [result, setResult] = useState(null);
   const up = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
@@ -170,6 +171,16 @@ function NewAgentCard() {
         <input className="cp-input cp-mono" value={form.recipients} onChange={up('recipients')} placeholder="0x…, 0x…" />
       </Field>
       {badRecipient && <div className="cp-note error">Not a valid address: {badRecipient}</div>}
+      <label className="cp-row" style={{ fontSize: '0.84rem', color: 'var(--text-muted)', cursor: 'pointer' }}>
+        <input
+          type="checkbox"
+          checked={form.allowMpp}
+          onChange={(e) => setForm((f) => ({ ...f, allowMpp: e.target.checked }))}
+          style={{ accentColor: 'var(--accent)' }}
+        />
+        Allow paid APIs (MPP). The agent can also pay HTTP 402 APIs with <code>@tempoflow/agent</code>; these
+        payments have no task memo.
+      </label>
       <div className="cp-row">
         <AsyncButton
           disabled={!ws.company || !form.name.trim() || !(Number(form.dailyLimit) > 0) || !!badRecipient}
@@ -227,6 +238,7 @@ function AgentRow({ agent, remaining, onChanged }) {
         </td>
         <td>
           {agent.recipients?.length ? `${agent.recipients.length} allowed` : 'any'} · {agent.expiryDays}d
+          {agent.allowMpp ? ' · MPP' : ''}
         </td>
         <td>
           <TxLink hash={agent.authTx} label="auth tx" />
