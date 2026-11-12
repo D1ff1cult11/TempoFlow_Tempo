@@ -28,7 +28,7 @@ function TokenCard({ symbol, balance, icon: Icon, color, glow, isLoading, onWith
   return (
     <div
       style={{
-        background: `linear-gradient(135deg, rgba(15,21,32,0.9) 0%, rgba(11,15,23,0.95) 100%)`,
+        background: `var(--surface)`,
         border: `1px solid ${color}33`,
         borderRadius: '14px',
         padding: '20px',
@@ -36,7 +36,7 @@ function TokenCard({ symbol, balance, icon: Icon, color, glow, isLoading, onWith
         flexDirection: 'column',
         gap: '14px',
         transition: 'all 0.25s ease',
-        boxShadow: isLoading ? `0 0 20px ${glow}` : 'none',
+        boxShadow: "none",
         position: 'relative',
         overflow: 'hidden',
       }}
@@ -72,7 +72,7 @@ function TokenCard({ symbol, balance, icon: Icon, color, glow, isLoading, onWith
             <Icon size={20} color={color} strokeWidth={2.5} />
           </div>
           <div>
-            <div style={{ fontWeight: 700, fontFamily: 'var(--font-sans)', fontSize: '1rem', color: '#fff' }}>
+            <div style={{ fontWeight: 700, fontFamily: 'var(--font-sans)', fontSize: '1rem', color: 'var(--text)' }}>
               {symbol}
             </div>
             <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
@@ -136,7 +136,7 @@ function TokenCard({ symbol, balance, icon: Icon, color, glow, isLoading, onWith
         }}
         onMouseEnter={(e) => {
           e.currentTarget.style.background = `${color}40`;
-          e.currentTarget.style.boxShadow = `0 0 16px ${glow}`;
+          e.currentTarget.style.borderColor = "var(--accent-line)";
         }}
         onMouseLeave={(e) => {
           e.currentTarget.style.background = isDemoMode ? `${color}22` : `${color}33`;
@@ -198,8 +198,8 @@ export function TreasuryVault() {
                 width: '32px',
                 height: '32px',
                 borderRadius: '8px',
-                background: 'linear-gradient(135deg, rgba(0,210,106,0.3) 0%, rgba(0,240,255,0.2) 100%)',
-                border: '1px solid rgba(0,210,106,0.4)',
+                background: 'var(--surface)',
+                border: '1px solid color-mix(in srgb, var(--accent) 40%, transparent)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -213,7 +213,7 @@ export function TreasuryVault() {
                 fontWeight: 800,
                 fontFamily: 'var(--font-sans)',
                 letterSpacing: '-0.02em',
-                color: '#fff',
+                color: 'var(--text)',
               }}
             >
               Merchant Settlement Vault
@@ -269,8 +269,8 @@ export function TreasuryVault() {
           symbol="USDC"
           balance={merchantVaultUSDC}
           icon={DollarSign}
-          color="#00D26A"
-          glow="rgba(0,210,106,0.25)"
+          color="var(--accent)"
+          glow="color-mix(in srgb, var(--accent) 25%, transparent)"
           isLoading={isVaultLoading}
           onWithdraw={withdrawFromVault}
           isDemoMode={isDemoMode}
@@ -279,8 +279,8 @@ export function TreasuryVault() {
           symbol="EURC"
           balance={merchantVaultEURC}
           icon={Euro}
-          color="#00F0FF"
-          glow="rgba(0,240,255,0.2)"
+          color="var(--accent-text)"
+          glow="color-mix(in srgb, var(--accent) 20%, transparent)"
           isLoading={isVaultLoading}
           onWithdraw={withdrawFromVault}
           isDemoMode={isDemoMode}
@@ -297,13 +297,13 @@ export function TreasuryVault() {
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '14px' }}>
-          <SplitSquareHorizontal size={16} color="var(--tempo-cyan)" />
+          <SplitSquareHorizontal size={16} color="var(--accent-text)" />
           <span
             style={{
               fontWeight: 700,
               fontFamily: 'var(--font-sans)',
               fontSize: '0.9rem',
-              color: '#fff',
+              color: 'var(--text)',
             }}
           >
             Auto-Split Revenue Forwarder
@@ -370,7 +370,7 @@ export function TreasuryVault() {
             onClick={handleSaveSplit}
             style={{
               background: splitSaved
-                ? 'rgba(0,210,106,0.2)'
+                ? 'color-mix(in srgb, var(--accent) 20%, transparent)'
                 : 'rgba(255,255,255,0.06)',
               border: splitSaved
                 ? '1px solid var(--tempo-emerald)'

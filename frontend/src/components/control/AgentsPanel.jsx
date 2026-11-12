@@ -211,7 +211,7 @@ function AgentRow({ agent, remaining, onChanged }) {
         <td style={{ minWidth: 170 }}>
           {agent.status === 'active' ? (
             <>
-              <div className="cp-mono" style={{ marginBottom: 4, color: low ? '#FFD166' : undefined }}>
+              <div className="cp-mono" style={{ marginBottom: 4, color: low ? 'var(--warning)' : undefined }}>
                 {left == null ? '…' : `${usd(left)} left`} of {usd(agent.dailyLimit)} {tokenSymbol(agent.token)}
               </div>
               <Bar used={left == null ? 0 : agent.dailyLimit - left} total={agent.dailyLimit} />

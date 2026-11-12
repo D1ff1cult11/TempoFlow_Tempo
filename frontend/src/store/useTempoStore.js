@@ -1,6 +1,11 @@
 import { useState, useEffect } from 'react';
 import confetti from 'canvas-confetti';
 import { sound } from '../audio/soundEffects';
+
+const themeConfetti = () => {
+  const css = getComputedStyle(document.documentElement);
+  return [css.getPropertyValue('--accent').trim() || '#8b7cff', css.getPropertyValue('--text').trim() || '#e8e9f0'];
+};
 import { CONTRACT_ADDRESSES, ERC20_ABI, ROUTER_ABI, PAYROLL_ABI, VAULT_ABI, NETWORK_CONFIG } from '../config/contracts';
 import { ethers } from 'ethers';
 
@@ -164,7 +169,7 @@ export function useTempoStore() {
       particleCount: 80,
       spread: 70,
       origin: { y: 0.6 },
-      colors: ['#00D26A', '#00F0FF', '#9945FF'],
+      colors: themeConfetti(),
     });
 
     state.activeReceipt = newTx;
@@ -184,7 +189,7 @@ export function useTempoStore() {
       particleCount: 50,
       spread: 50,
       origin: { y: 0.7 },
-      colors: ['#00F0FF', '#00D26A'],
+      colors: themeConfetti(),
     });
 
     emit();
@@ -202,7 +207,7 @@ export function useTempoStore() {
       particleCount: 100,
       spread: 90,
       origin: { y: 0.5 },
-      colors: ['#00D26A', '#F97316', '#00F0FF'],
+      colors: themeConfetti(),
     });
 
     emit();
@@ -252,7 +257,7 @@ export function useTempoStore() {
         state.walletBalanceEURC += state.merchantVaultEURC;
         state.merchantVaultEURC = 0;
       }
-      confetti({ particleCount: 60, spread: 60, origin: { y: 0.6 }, colors: ['#00D26A', '#00F0FF'] });
+      confetti({ particleCount: 60, spread: 60, origin: { y: 0.6 }, colors: themeConfetti() });
       emit();
       return;
     }
@@ -289,7 +294,7 @@ export function useTempoStore() {
       }
 
       sound.playCashChime();
-      confetti({ particleCount: 60, spread: 60, origin: { y: 0.6 }, colors: ['#00D26A', '#00F0FF'] });
+      confetti({ particleCount: 60, spread: 60, origin: { y: 0.6 }, colors: themeConfetti() });
     } catch (err) {
       console.error('Vault withdraw failed:', err);
       alert('Withdraw failed: ' + (err.reason || err.message));
@@ -543,7 +548,7 @@ export function useTempoStore() {
         particleCount: 100,
         spread: 80,
         origin: { y: 0.6 },
-        colors: ['#00D26A', '#00F0FF', '#9945FF'],
+        colors: themeConfetti(),
       });
 
       await refreshOnChainBalances();
@@ -574,7 +579,7 @@ export function useTempoStore() {
 
       sound.playClaimChime();
       state.streamClaimableBalance = 0.000001;
-      confetti({ particleCount: 100, spread: 80, origin: { y: 0.5 }, colors: ['#00D26A', '#F97316'] });
+      confetti({ particleCount: 100, spread: 80, origin: { y: 0.5 }, colors: themeConfetti() });
       await refreshOnChainBalances();
       emit();
     } catch (err) {

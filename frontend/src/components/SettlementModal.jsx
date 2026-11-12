@@ -23,9 +23,9 @@ export function SettlementModal() {
         maxWidth: '440px',
         width: '100%',
         padding: '28px',
-        background: '#0B0F17',
-        border: '1px solid rgba(0, 210, 106, 0.4)',
-        boxShadow: '0 0 50px rgba(0, 210, 106, 0.25)',
+        background: 'var(--surface)',
+        border: '1px solid color-mix(in srgb, var(--accent) 40%, transparent)',
+        boxShadow: 'none',
         position: 'relative',
       }}>
         {/* Close Button */}
@@ -50,7 +50,7 @@ export function SettlementModal() {
             width: '54px',
             height: '54px',
             borderRadius: '50%',
-            background: 'rgba(0, 210, 106, 0.15)',
+            background: 'color-mix(in srgb, var(--accent) 15%, transparent)',
             border: '1px solid var(--tempo-emerald)',
             display: 'flex',
             alignItems: 'center',
@@ -61,7 +61,7 @@ export function SettlementModal() {
             <CheckCircle2 size={32} />
           </div>
 
-          <h3 style={{ fontSize: '1.25rem', fontWeight: 800, fontFamily: 'var(--font-sans)', color: '#FFFFFF' }}>
+          <h3 style={{ fontSize: '1.25rem', fontWeight: 800, fontFamily: 'var(--font-sans)', color: 'var(--text)' }}>
             {activeReceipt.isOnChain ? 'Payment Settled' : 'Payment Settled (simulated)'}
           </h3>
           <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
@@ -80,12 +80,12 @@ export function SettlementModal() {
         }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
             <span style={{ color: 'var(--text-muted)' }}>Order ID / Hash:</span>
-            <span style={{ fontFamily: 'var(--font-mono)', color: '#FFFFFF' }}>{activeReceipt.hash}</span>
+            <span style={{ fontFamily: 'var(--font-mono)', color: 'var(--text)' }}>{activeReceipt.hash}</span>
           </div>
 
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
             <span style={{ color: 'var(--text-muted)' }}>Gross Amount Paid:</span>
-            <span style={{ fontWeight: 700, color: '#FFFFFF' }}>{activeReceipt.amountIn}</span>
+            <span style={{ fontWeight: 700, color: 'var(--text)' }}>{activeReceipt.amountIn}</span>
           </div>
 
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>

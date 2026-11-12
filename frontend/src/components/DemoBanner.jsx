@@ -18,10 +18,10 @@ export function DemoBanner() {
   if (!isDemoMode) {
     return (
       <div style={{
-        background: 'linear-gradient(90deg, rgba(0, 240, 255, 0.12) 0%, rgba(153, 69, 255, 0.12) 100%)',
-        borderBottom: '1px solid rgba(0, 240, 255, 0.3)',
+        background: 'var(--surface)',
+        borderBottom: '1px solid color-mix(in srgb, var(--accent) 30%, transparent)',
         padding: '10px 24px',
-        boxShadow: '0 4px 15px rgba(0, 0, 0, 0.25)',
+        boxShadow: 'none',
       }}>
         <div style={{
           maxWidth: '1280px',
@@ -35,7 +35,7 @@ export function DemoBanner() {
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <span className="pulse-dot"></span>
             <div>
-              <div style={{ fontSize: '0.88rem', fontWeight: 700, color: '#FFFFFF', fontFamily: 'var(--font-sans)' }}>
+              <div style={{ fontSize: '0.88rem', fontWeight: 700, color: 'var(--text)', fontFamily: 'var(--font-sans)' }}>
                 Live Web3 Mode (not available yet)
               </div>
               <div style={{ fontSize: '0.74rem', color: 'var(--text-muted)' }}>
@@ -57,7 +57,7 @@ export function DemoBanner() {
                 <button
                   onClick={addTempoNetworkToMetamask}
                   className="btn-secondary"
-                  style={{ fontSize: '0.8rem', padding: '6px 12px', borderColor: 'rgba(0, 240, 255, 0.4)', color: 'var(--tempo-cyan)' }}
+                  style={{ fontSize: '0.8rem', padding: '6px 12px', borderColor: 'color-mix(in srgb, var(--accent) 40%, transparent)', color: 'var(--tempo-cyan)' }}
                 >
                   + Add Tempo L1 to MetaMask
                 </button>
@@ -67,7 +67,7 @@ export function DemoBanner() {
                 <div style={{
                   padding: '4px 10px',
                   borderRadius: '6px',
-                  background: 'rgba(0, 210, 106, 0.15)',
+                  background: 'color-mix(in srgb, var(--accent) 15%, transparent)',
                   border: '1px solid var(--tempo-emerald)',
                   fontSize: '0.75rem',
                   fontFamily: 'var(--font-mono)',
@@ -78,14 +78,14 @@ export function DemoBanner() {
                 <button
                   onClick={() => mintTestnetFaucet('USDC')}
                   className="btn-secondary"
-                  style={{ fontSize: '0.78rem', padding: '6px 10px', color: 'var(--tempo-emerald)', borderColor: 'rgba(0, 210, 106, 0.3)' }}
+                  style={{ fontSize: '0.78rem', padding: '6px 10px', color: 'var(--tempo-emerald)', borderColor: 'color-mix(in srgb, var(--accent) 30%, transparent)' }}
                 >
                   🚰 Mint 1,000 USDC Faucet
                 </button>
                 <button
                   onClick={() => mintTestnetFaucet('EURC')}
                   className="btn-secondary"
-                  style={{ fontSize: '0.78rem', padding: '6px 10px', color: 'var(--tempo-cyan)', borderColor: 'rgba(0, 240, 255, 0.3)' }}
+                  style={{ fontSize: '0.78rem', padding: '6px 10px', color: 'var(--tempo-cyan)', borderColor: 'color-mix(in srgb, var(--accent) 30%, transparent)' }}
                 >
                   🚰 Mint 1,000 EURC
                 </button>
@@ -108,10 +108,10 @@ export function DemoBanner() {
 
   return (
     <div style={{
-      background: 'linear-gradient(90deg, rgba(0, 210, 106, 0.12) 0%, rgba(0, 240, 255, 0.1) 50%, rgba(153, 69, 255, 0.12) 100%)',
-      borderBottom: '1px solid rgba(0, 210, 106, 0.3)',
+      background: 'var(--surface)',
+      borderBottom: '1px solid color-mix(in srgb, var(--accent) 30%, transparent)',
       padding: '12px 24px',
-      boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)',
+      boxShadow: 'none',
     }}>
       <div style={{
         maxWidth: '1280px',
@@ -131,12 +131,12 @@ export function DemoBanner() {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            color: '#06080D',
+            color: 'var(--accent-ink)',
           }}>
             <Sparkles size={16} />
           </div>
           <div>
-            <div style={{ fontSize: '0.9rem', fontWeight: 700, color: '#FFFFFF', fontFamily: 'var(--font-sans)' }}>
+            <div style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--text)', fontFamily: 'var(--font-sans)' }}>
               Demo Mode (simulated, no wallet needed)
             </div>
             <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
@@ -163,7 +163,7 @@ export function DemoBanner() {
             style={{
               fontSize: '0.82rem',
               padding: '8px 14px',
-              borderColor: 'rgba(0, 240, 255, 0.3)',
+              borderColor: 'color-mix(in srgb, var(--accent) 30%, transparent)',
               color: 'var(--tempo-cyan)',
             }}
           >
@@ -177,7 +177,7 @@ export function DemoBanner() {
             style={{
               fontSize: '0.82rem',
               padding: '8px 14px',
-              borderColor: 'rgba(0, 210, 106, 0.3)',
+              borderColor: 'color-mix(in srgb, var(--accent) 30%, transparent)',
               color: 'var(--tempo-emerald)',
             }}
           >
