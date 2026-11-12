@@ -1,121 +1,80 @@
 import React, { useEffect, useState } from 'react';
-import { Navbar } from './components/Navbar';
+import { AppShell, PageHead, PAGES, EXTRA_PAGES } from './components/layout/AppShell';
+import { Overview } from './components/control/Overview';
+import { AgentsPanel } from './components/control/AgentsPanel';
+import { PeoplePanel } from './components/control/PeoplePanel';
+import { LedgerPanel } from './components/control/LedgerPanel';
+import { TreasuryPanel } from './components/control/TreasuryPanel';
 import { DemoBanner } from './components/DemoBanner';
 import { MerchantTerminal } from './components/MerchantTerminal';
 import { PayrollOdometer } from './components/PayrollOdometer';
 import { TreasuryVault } from './components/TreasuryVault';
 import { SettlementModal } from './components/SettlementModal';
+import { actions, useWorkspace } from './store/useWorkspace';
 import { CompanySetup } from './components/control/CompanySetup';
-import { AgentsPanel } from './components/control/AgentsPanel';
-import { PeoplePanel } from './components/control/PeoplePanel';
-import { LedgerPanel } from './components/control/LedgerPanel';
-import { TreasuryPanel } from './components/control/TreasuryPanel';
-import { Bot, Users, BookOpen, ArrowRightLeft, FlaskConical, Github } from 'lucide-react';
 
-const TABS = [
-  { id: 'agents', label: 'Agents', icon: Bot },
-  { id: 'people', label: 'People', icon: Users },
-  { id: 'ledger', label: 'Ledger', icon: BookOpen },
-  { id: 'treasury', label: 'Treasury', icon: ArrowRightLeft },
-  { id: 'demos', label: 'Prototype demos', icon: FlaskConical },
-];
+const HEADS = {
+  overview: {
+    title: 'One treasury for your people and your AI agents',
+    sub: 'Budgets enforced by Tempo, batched pay runs and one ledger. Live on Tempo testnet with free test stablecoins.',
+  },
+  agents: {
+    title: 'Agents',
+    sub: 'Each agent gets its own key with a daily limit, allowed payees and an expiry. Tempo rejects anything outside them.',
+  },
+  people: { title: 'People', sub: 'Pay contractors in one transaction, each payout tagged with its invoice number.' },
+  ledger: { title: 'Ledger', sub: 'Every payment from your treasury, rebuilt from the chain and matched to the agent or person.' },
+  treasury: { title: 'Treasury', sub: 'Convert between stablecoins at live rates from Tempo’s built-in exchange.' },
+  demos: { title: 'Prototype demos', sub: 'Earlier ideas, fully simulated in your browser. Their contracts are not deployed.' },
+};
 
-const initialTab = () => {
+const ALL = [...PAGES, ...EXTRA_PAGES].map((p) => p.id);
+const fromHash = () => {
   const h = window.location.hash.replace('#', '');
-  return TABS.some((t) => t.id === h) ? h : 'agents';
+  return ALL.includes(h) ? h : 'overview';
 };
 
 export default function App() {
-  const [tab, setTab] = useState(initialTab);
+  const [page, setPage] = useState(fromHash);
+  const ws = useWorkspace();
+
   useEffect(() => {
-    history.replaceState(null, '', `#${tab}`);
-  }, [tab]);
+    actions.checkRelay();
+    const onHash = () => setPage(fromHash());
+    window.addEventListener('hashchange', onHash);
+    return () => window.removeEventListener('hashchange', onHash);
+  }, []);
+
+  const navigate = (id) => {
+    setPage(id);
+    history.replaceState(null, '', `#${id}`);
+    window.scrollTo({ top: 0 });
+  };
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-      <Navbar />
-      {tab === 'demos' && <DemoBanner />}
-
-      <main style={{ maxWidth: '1280px', width: '100%', margin: '0 auto', padding: '24px', flex: 1 }}>
-        <div style={{ marginBottom: '22px' }}>
-          <h1 style={{
-            fontSize: 'clamp(1.5rem, 3.5vw, 2.2rem)',
-            fontWeight: 800,
-            fontFamily: 'var(--font-sans)',
-            letterSpacing: '-0.02em',
-            lineHeight: 1.2,
-          }}>
-            One treasury for your people and your AI agents
-          </h1>
-          <p style={{ fontSize: '0.95rem', color: 'var(--text-muted)', marginTop: '8px', maxWidth: '820px', lineHeight: 1.55 }}>
-            Give every agent its own budget, allowed payees and expiry, enforced by Tempo itself. Pay contractors in one
-            batched transaction. See all spending, for people and agents, in one ledger. Live on Tempo testnet with free
-            test stablecoins.
-          </p>
-        </div>
-
-        <div style={{ marginBottom: '20px' }}>
-          <CompanySetup />
-        </div>
-
-        <div className="cp-tabs" role="tablist">
-          {TABS.map(({ id, label, icon: Icon }) => (
-            <button key={id} role="tab" className="cp-tab" aria-selected={tab === id} onClick={() => setTab(id)}>
-              <Icon size={15} /> {label}
-            </button>
-          ))}
-        </div>
-
-        {tab === 'agents' && <AgentsPanel />}
-        {tab === 'people' && <PeoplePanel />}
-        {tab === 'ledger' && <LedgerPanel />}
-        {tab === 'treasury' && <TreasuryPanel />}
-        {tab === 'demos' && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '28px' }}>
-            <div className="cp-note warn">
-              These are early prototypes and are fully simulated in your browser: merchant checkout, per-second
-              streaming payroll and a merchant vault. Their contracts are not deployed yet.
-            </div>
+    <AppShell page={page} onNavigate={navigate}>
+      {page === 'demos' && <DemoBanner />}
+      <main className="page">
+        <PageHead title={HEADS[page].title} sub={HEADS[page].sub} />
+        {!ws.company && !['overview', 'demos'].includes(page) && (
+          <div style={{ marginBottom: 20 }}>
+            <CompanySetup />
+          </div>
+        )}
+        {page === 'overview' && <Overview onNavigate={navigate} />}
+        {page === 'agents' && <AgentsPanel />}
+        {page === 'people' && <PeoplePanel />}
+        {page === 'ledger' && <LedgerPanel />}
+        {page === 'treasury' && <TreasuryPanel />}
+        {page === 'demos' && (
+          <div className="cp-stack" style={{ gap: 24 }}>
             <MerchantTerminal />
             <PayrollOdometer />
             <TreasuryVault />
           </div>
         )}
       </main>
-
       <SettlementModal />
-
-      <footer style={{
-        borderTop: '1px solid var(--border-subtle)',
-        background: 'rgba(6, 8, 13, 0.95)',
-        padding: '24px 16px',
-        marginTop: '40px',
-        fontSize: '0.82rem',
-        color: 'var(--text-dim)',
-      }}>
-        <div style={{
-          maxWidth: '1280px',
-          margin: '0 auto',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          flexWrap: 'wrap',
-          gap: '16px',
-        }}>
-          <div>
-            <strong>TempoFlow</strong> • Spend controls for people and AI agents on Tempo
-          </div>
-          <a
-            href="https://github.com/D1ff1cult11/TempoFlow_Tempo"
-            target="_blank"
-            rel="noreferrer"
-            style={{ color: 'var(--text-muted)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '6px' }}
-          >
-            <Github size={15} />
-            GitHub Repository
-          </a>
-        </div>
-      </footer>
-    </div>
+    </AppShell>
   );
 }
