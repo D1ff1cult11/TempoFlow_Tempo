@@ -5,6 +5,7 @@ import { useWorkspace, actions } from '../../store/useWorkspace';
 import { TOKENS, DEFAULT_TOKEN, usd, tokenSymbol } from '../../lib/tempo';
 import { AsyncButton, Result, AddressLink, Field } from './ui';
 import { InvitesCard } from './InvitesCard';
+import { ScheduleCard } from './ScheduleCard';
 
 const isAddress = (a) => /^0x[0-9a-fA-F]{40}$/.test(a.trim());
 const thisPeriod = () => new Date().toISOString().slice(0, 7); // e.g. 2026-11
@@ -138,6 +139,7 @@ export function PeoplePanel() {
           is planned, not built.
         </div>
       </div>
+      <ScheduleCard />
     </div>
   );
 }
