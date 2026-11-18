@@ -115,10 +115,12 @@ export const actions = {
     set((s) => ({ teams: s.teams.map((t) => (t.id === teamId ? { ...t, dailyCap: Number(dailyCap) } : t)) }));
   },
 
-  async addAgent({ name, teamId, token, dailyLimit, recipients, expiryDays, allowMpp }) {
+  async addAgent({ name, teamId, token, dailyLimit, recipients, expiryDays, allowMpp, keySource = 'browser', keyAddress }) {
     const problem = checkTeamCap(state, teamId, dailyLimit);
     if (problem) throw new Error(problem);
-    const key = T.newAgentKey(state.company.address);
+    // 'runtime': the agent created its own key and shared only the address, so no private key is stored here.
+    const key =
+      keySource === 'runtime' ? { keyAddress, keySource: 'runtime' } : { ...T.newAgentKey(state.company.address), keySource: 'browser' };
     const agent = {
       id: uid('agent'),
       name,
@@ -168,6 +170,7 @@ export const actions = {
 
   async agentTestPay(agentId, { to, amount, task }) {
     const agent = state.agents.find((a) => a.id === agentId);
+    if (!agent.privateKey) throw new Error("This agent's key lives in its own runtime, so only the agent can pay with it.");
     const memo = `a:${agent.name.slice(0, 12)}|t:${task}`.slice(0, 32);
     const hash = await T.agentPay({
       companyAddress: state.company.address,

@@ -25,6 +25,7 @@ const agent = createAgent({
   companyAddress: env('TEMPOFLOW_COMPANY'),
   token: env('TEMPOFLOW_TOKEN'),
   relayUrl: env('TEMPOFLOW_RELAY_URL', false),
+  keyAddress: env('TEMPOFLOW_KEY_ADDRESS', false), // optional check against the key TempoFlow authorized
 });
 
 const price = '0.50';

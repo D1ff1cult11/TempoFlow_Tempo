@@ -118,6 +118,8 @@ function NewAgentCard() {
     recipients: '',
     expiryDays: '30',
     allowMpp: false,
+    keySource: 'runtime', // 'runtime': the agent made its own key | 'browser': quick test key made here
+    keyAddress: '',
   });
   const [result, setResult] = useState(null);
   const up = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
@@ -126,6 +128,19 @@ function NewAgentCard() {
     .map((r) => r.trim())
     .filter(Boolean);
   const badRecipient = recipients.find((r) => !isAddress(r));
+  const runtime = form.keySource === 'runtime';
+  const keyTaken = ws.agents.some(
+    (a) => a.status === 'active' && a.keyAddress.toLowerCase() === form.keyAddress.trim().toLowerCase(),
+  );
+  const keyProblem = !runtime
+    ? null
+    : !form.keyAddress.trim()
+      ? 'Paste the key address your agent created.'
+      : !isAddress(form.keyAddress)
+        ? 'That is not a valid key address (0x + 40 hex characters).'
+        : keyTaken
+          ? 'An active agent already uses this key.'
+          : null;
 
   return (
     <div className="glass-panel cp-card cp-stack">
@@ -134,10 +149,40 @@ function NewAgentCard() {
           <Plus size={18} /> Add an agent
         </div>
         <p className="cp-sub">
-          Creates a new key for the agent and authorizes it on Tempo with a daily limit, an expiry date and (optionally) a
-          list of the only addresses it may pay. The agent can only send memo-tagged transfers, so every payment is traceable.
+          Authorizes the agent's key on Tempo with a daily limit, an expiry date and (optionally) a list of the only
+          addresses it may pay. The agent can only send memo-tagged transfers, so every payment is traceable.
         </p>
       </div>
+      <div className="cp-row" role="radiogroup" aria-label="Where the agent key comes from">
+        {[
+          ['runtime', "Agent's own key (recommended)"],
+          ['browser', 'Generate in this browser (quick test)'],
+        ].map(([value, label]) => (
+          <label key={value} className="cp-row" style={{ gap: 6, cursor: 'pointer', fontSize: '0.86rem' }}>
+            <input
+              type="radio"
+              name="keySource"
+              checked={form.keySource === value}
+              onChange={() => setForm((f) => ({ ...f, keySource: value }))}
+              style={{ accentColor: 'var(--accent)' }}
+            />
+            {label}
+          </label>
+        ))}
+      </div>
+      {runtime && (
+        <>
+          <div className="cp-note">
+            Create the key where the agent runs, so its private key never touches TempoFlow:{' '}
+            <code>npx tempoflow-agent-keygen</code> or <code>generateAgentKey()</code> from <code>@tempoflow/agent</code>.
+            Keep the private key in the agent's secret store and paste only the key address here.
+          </div>
+          <Field label="Agent key address">
+            <input className="cp-input cp-mono" value={form.keyAddress} onChange={up('keyAddress')} placeholder="0x…" />
+          </Field>
+          {form.keyAddress && keyProblem && <div className="cp-note error">{keyProblem}</div>}
+        </>
+      )}
       <div className="cp-form">
         <Field label="Agent name">
           <input className="cp-input" value={form.name} onChange={up('name')} maxLength={24} />
@@ -183,8 +228,11 @@ function NewAgentCard() {
       </label>
       <div className="cp-row">
         <AsyncButton
-          disabled={!ws.company || !form.name.trim() || !(Number(form.dailyLimit) > 0) || !!badRecipient}
-          onClick={() => actions.addAgent({ ...form, name: form.name.trim(), recipients })}
+          disabled={!ws.company || !form.name.trim() || !(Number(form.dailyLimit) > 0) || !!badRecipient || !!keyProblem}
+          onClick={async () => {
+            await actions.addAgent({ ...form, name: form.name.trim(), recipients, keyAddress: form.keyAddress.trim() });
+            setForm((f) => ({ ...f, keyAddress: '' }));
+          }}
           onResult={setResult}
         >
           <Bot size={16} /> Authorize agent on Tempo
@@ -192,6 +240,35 @@ function NewAgentCard() {
         {!ws.company && <span className="cp-sub">Create the company account first.</span>}
       </div>
       <Result result={result} okText="Agent authorized on Tempo testnet." />
+    </div>
+  );
+}
+
+/** What to put in the agent's environment. Never includes the private key: the agent already holds it. */
+function SdkSetup({ agent }) {
+  const ws = useWorkspace();
+  const relay = `${window.location.origin}/api/relay`;
+  const env = [
+    `TEMPOFLOW_COMPANY=${ws.company.address}`,
+    `TEMPOFLOW_TOKEN=${agent.token}`,
+    `TEMPOFLOW_KEY_ADDRESS=${agent.keyAddress}`,
+    ws.relayReady ? `TEMPOFLOW_RELAY_URL=${relay}` : null,
+    'TEMPOFLOW_AGENT_KEY=<the private key your agent already holds>',
+  ]
+    .filter(Boolean)
+    .join('\n');
+  return (
+    <div className="cp-stack" style={{ gap: 8 }}>
+      <div className="cp-sub">
+        This agent holds its own key, so only its code can pay with it. Give the agent these settings and use{' '}
+        <code>@tempoflow/agent</code>:
+      </div>
+      <pre className="cp-note cp-mono" style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-all', margin: 0 }}>
+        {env}
+      </pre>
+      <button className="btn-secondary btn-sm" style={{ alignSelf: 'flex-start' }} onClick={() => navigator.clipboard?.writeText(env)}>
+        <Copy size={13} /> Copy SDK setup
+      </button>
     </div>
   );
 }
@@ -212,7 +289,7 @@ function AgentRow({ agent, remaining, onChanged }) {
         <td>
           <div style={{ fontWeight: 700 }}>{agent.name}</div>
           <div className="cp-mono" style={{ color: 'var(--text-dim)' }}>
-            key {short(agent.keyAddress)}
+            key {short(agent.keyAddress)} · {agent.privateKey ? 'test key' : 'own key'}
           </div>
         </td>
         <td>{team?.name ?? '—'}</td>
@@ -255,6 +332,8 @@ function AgentRow({ agent, remaining, onChanged }) {
         <tr>
           <td colSpan={7} style={{ background: 'rgba(0,0,0,0.25)' }}>
             <div className="cp-stack" style={{ padding: '6px 0' }}>
+              {!agent.privateKey && <SdkSetup agent={agent} />}
+              {agent.privateKey && (
               <div className="cp-form">
                 <Field label="Test payment: pay to">
                   <input
@@ -283,6 +362,7 @@ function AgentRow({ agent, remaining, onChanged }) {
                   <Send size={14} /> Pay as this agent
                 </AsyncButton>
               </div>
+              )}
               <div className="cp-form">
                 <Field label={`New daily limit (team "${team?.name}" cap ${usd(team?.dailyCap)})`}>
                   <input className="cp-input" type="number" step="0.01" value={newLimit} onChange={(e) => setNewLimit(e.target.value)} />
@@ -298,22 +378,25 @@ function AgentRow({ agent, remaining, onChanged }) {
                 >
                   <ArrowUpCircle size={14} /> Change limit
                 </AsyncButton>
-                <button
-                  className="btn-secondary"
-                  title="Copy the agent's private key to install it in the agent's own runtime (testnet only)"
-                  onClick={() => navigator.clipboard?.writeText(agent.privateKey)}
-                >
-                  <Copy size={14} /> Copy agent key
-                </button>
+                {agent.privateKey && (
+                  <button
+                    className="btn-secondary"
+                    title="Copy the test key made in this browser (testnet only)"
+                    onClick={() => navigator.clipboard?.writeText(agent.privateKey)}
+                  >
+                    <Copy size={14} /> Copy test key
+                  </button>
+                )}
                 <AsyncButton className="btn-danger" onClick={() => actions.revoke(agent.id)} onResult={setResult}>
                   <ShieldOff size={14} /> Revoke now
                 </AsyncButton>
               </div>
-              <div className="cp-note">
-                "Pay as this agent" signs with the agent's own key, exactly as your agent's code would. Tempo rejects any
-                payment above the remaining limit, to a recipient outside the list, or after expiry. Here the agent key is
-                kept in this browser for testing; in production it lives in your agent's runtime.
-              </div>
+              {agent.privateKey && (
+                <div className="cp-note warn">
+                  Test key: this agent's private key is stored in this browser so you can try "Pay as this agent". For
+                  real agents, use "Agent's own key" so the key never leaves the agent's runtime.
+                </div>
+              )}
               <Result result={result} okText="Done on Tempo testnet." />
             </div>
           </td>

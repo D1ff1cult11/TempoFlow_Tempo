@@ -32,7 +32,7 @@ Work is tracked as GitHub issues, grouped by milestone. Labels: `agents`, `payro
 - [x] Server-side fee payer (`withFeePayer` transport + Vercel relay); browser sponsor key removed
 - [x] Redesign: sidebar app, Overview page, 60/30/10 color system (graphite amber)
 - [x] Agent SDK (`packages/agent-sdk`): pay with a task memo, budget checks, paid APIs over MPP
-- [ ] Hand-off of agent keys: generate in the agent runtime, register the public key in TempoFlow (keys never touch the panel)
+- [x] Hand-off of agent keys: generated in the agent runtime (`npx tempoflow-agent-keygen`); the panel only stores the key address
 - [ ] Alerts: webhook / email when an agent drops under 20% of its daily budget, hits a limit, or nears expiry
 - [ ] Limit-raise requests and approvals (agent asks, admin approves, `updateLimit` on-chain)
 - [ ] Multiple admins per company (configurable accounts once available on testnet/mainnet)

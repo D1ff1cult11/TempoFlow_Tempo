@@ -17,7 +17,7 @@ if (process.argv.includes('--throwaway') && !process.env.TEMPO_SPONSOR_PRIVATE_K
   console.log('throwaway sponsor funded:', address);
 }
 
-const { handle } = await import('../api/_relay.mjs');
+const { handle } = await import('../frontend/api/_relay.mjs');
 const PORT = Number(process.env.RELAY_PORT || 8787);
 
 createServer(async (req, res) => {

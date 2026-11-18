@@ -50,10 +50,19 @@ For `paidFetch()`, turn on **Allow paid APIs (MPP)** when adding the agent in Te
 
 Best practice: create the key where the agent runs and only share its address.
 
+```bash
+npx tempoflow-agent-keygen   # prints the key address (for TempoFlow) and the private key (for your secret store)
+```
+
+Then in TempoFlow → Agents → **Agent's own key**, paste the key address. Or in code:
+
 ```js
 import { generateAgentKey } from '@tempoflow/agent';
 const { privateKey, keyAddress } = generateAgentKey(); // store privateKey in your secret manager
 ```
+
+Pass `keyAddress` (TempoFlow's *Copy SDK setup* gives it as `TEMPOFLOW_KEY_ADDRESS`) to `createAgent()` and it'll refuse to start if
+the private key doesn't match the key TempoFlow authorized.
 
 Never give an agent an admin key or the company's own key.
 

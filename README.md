@@ -33,9 +33,9 @@ data, compute and services on their own). TempoFlow is the control panel for bot
 | Pay runs: batched transfers with invoice memos | ✅ **Live on Tempo testnet** |
 | Ledger rebuilt from chain + CSV export | ✅ **Live on Tempo testnet** |
 | Stablecoin conversion via the Stablecoin DEX | ✅ **Live on Tempo testnet** |
-| Fee sponsorship | ✅ **Server-side** fee-payer relay (`api/relay.mjs`, a Vercel function). The sponsor key lives only in the server environment; the relay only sponsors stablecoin (TIP-20) calls on testnet |
+| Fee sponsorship | ✅ **Server-side** fee-payer relay (`frontend/api/relay.mjs`, a Vercel function). The sponsor key lives only in the server environment; the relay only sponsors stablecoin (TIP-20) calls on testnet |
 | Company account | 🟡 Passkey (WebAuthn) or a throwaway test key, stored in your browser. Testnet only |
-| Agent keys | 🟡 Kept in the browser for testing. In production they live in the agent's own runtime |
+| Agent keys | ✅ Created in the agent's own runtime (`npx tempoflow-agent-keygen`); TempoFlow stores only the key address. A browser test key is still available for quick demos |
 | Pooled team budgets enforced on-chain | ❌ Not possible natively today (Tempo limits are per key). See [ROADMAP](ROADMAP.md) |
 | Cash-out to local bank accounts / compliance | ❌ Planned through a licensed partner. Not built |
 | Streaming payroll, merchant router and vault contracts | 🟡 Written and tested locally (10 Hardhat tests); **not deployed**. Shown as simulated demos |
@@ -85,6 +85,7 @@ cd frontend
 node scripts/smoke-agent-budget.mjs   # authorize agent, pay with memo, overspend blocked, revoke
 node scripts/smoke-payrun.mjs         # 3 payouts in 1 sponsored transaction, DEX quote + swap
 node scripts/smoke-relay.mjs          # server relay sponsors an agent payment; policy refuses other calls
+node scripts/smoke-key-handoff.mjs    # agent makes its own key; app authorizes only the address; agent pays
 ```
 
 ### Contracts (streaming payroll, merchant router, vault)
@@ -104,7 +105,7 @@ npx hardhat test
 | `frontend/src/components/control/` | Control panel screens (Overview, Agents, People, Ledger, Treasury) |
 | `frontend/src/components/layout/` | Sidebar app shell, bottom navigation on phones, theme switch |
 | `frontend/src/index.css` | Design tokens: 60/30/10 color system (graphite amber) |
-| `api/` | Vercel serverless fee-payer relay |
+| `frontend/api/` | Vercel serverless fee-payer relay (Vercel builds from `frontend/`) |
 | `packages/agent-sdk/` | `@tempoflow/agent`: what an agent runs to pay, check its budget and call paid (MPP) APIs |
 | `frontend/scripts/` | Testnet smoke tests |
 | `contracts/` | `TempoFlowRouter`, `TempoPayrollStream`, `MerchantSettlementVault` (+ mocks) |

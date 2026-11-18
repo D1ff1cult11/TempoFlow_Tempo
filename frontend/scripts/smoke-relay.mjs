@@ -1,5 +1,5 @@
 // Smoke test of server-side fee sponsorship on Tempo testnet.
-// Starts the real relay handler (api/_relay.mjs) in-process with a throwaway, in-memory sponsor key,
+// Starts the real relay handler (frontend/api/_relay.mjs) in-process with a throwaway, in-memory sponsor key,
 // then sends an agent payment with `feePayer: true` through the `withFeePayer` transport.
 // Checks: the agent's budget is charged only the payment (no fee), and a non-TIP-20 call is refused.
 //
@@ -16,7 +16,7 @@ const log = (...a) => console.log('•', ...a);
 
 process.env.TEMPO_SPONSOR_PRIVATE_KEY = generatePrivateKey(); // throwaway, never printed
 const sponsor = privateKeyToAccount(process.env.TEMPO_SPONSOR_PRIVATE_KEY).address;
-const { handle, validate } = await import('../../api/_relay.mjs');
+const { handle, validate } = await import('../api/_relay.mjs');
 
 const server = createServer(async (req, res) => {
   const chunks = [];
