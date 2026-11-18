@@ -214,11 +214,12 @@ export async function fxConvert({ company, tokenIn, tokenOut, amount, slippageBp
 // ---------- history from chain ----------
 const SPAN = 99_000n; // the public RPC accepts ~100k blocks per log query
 
-async function chunkedEvents(params, fromBlock) {
-  const latest = await client.getBlockNumber();
+/** Reads logs in RPC-sized chunks. Without toBlock: up to the chain head, capped to ~5 chunks (browser use). */
+async function chunkedEvents(params, fromBlock, toBlock) {
+  const latest = toBlock != null ? BigInt(toBlock) : await client.getBlockNumber();
   const out = [];
   let start = BigInt(fromBlock ?? latest - SPAN);
-  if (latest - start > SPAN * 5n) start = latest - SPAN * 5n; // cap work for the demo
+  if (toBlock == null && latest - start > SPAN * 5n) start = latest - SPAN * 5n; // cap work in the browser
   while (start <= latest) {
     const end = start + SPAN > latest ? latest : start + SPAN;
     out.push(...(await client.getContractEvents({ ...params, fromBlock: start, toBlock: end })));
@@ -228,13 +229,15 @@ async function chunkedEvents(params, fromBlock) {
 }
 
 /** Every AccessKeySpend event for this company account (payments AND fees an agent key paid). */
-export async function spendEvents({ companyAddress, fromBlock }) {
+export async function spendEvents({ companyAddress, fromBlock, toBlock }) {
   const logs = await chunkedEvents(
     { address: Addresses.accountKeychain, abi: Abis.accountKeychain, eventName: 'AccessKeySpend', args: { account: companyAddress } },
     fromBlock,
+    toBlock,
   );
   return logs.map((l) => ({
     hash: l.transactionHash,
+    logIndex: l.logIndex,
     blockNumber: Number(l.blockNumber),
     keyAddress: l.args.publicKey,
     token: l.args.token,
@@ -244,13 +247,15 @@ export async function spendEvents({ companyAddress, fromBlock }) {
 }
 
 /** Outgoing memo transfers for one token from the company account. */
-export async function memoTransfers({ companyAddress, token, fromBlock }) {
+export async function memoTransfers({ companyAddress, token, fromBlock, toBlock }) {
   const logs = await chunkedEvents(
     { address: token, abi: Abis.tip20, eventName: 'TransferWithMemo', args: { from: companyAddress } },
     fromBlock,
+    toBlock,
   );
   return logs.map((l) => ({
     hash: l.transactionHash,
+    logIndex: l.logIndex,
     blockNumber: Number(l.blockNumber),
     to: l.args.to,
     token,
