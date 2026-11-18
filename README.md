@@ -43,7 +43,8 @@ data, compute and services on their own). TempoFlow is the control panel for bot
 | Agent keys | ✅ Created in the agent's own runtime (`npx tempoflow-agent-keygen`); TempoFlow stores only the key address. A browser test key is still available for quick demos |
 | Pooled team budgets enforced on-chain | ❌ Not possible natively today (Tempo limits are per key). See [ROADMAP](ROADMAP.md) |
 | Cash-out to local bank accounts / compliance | ❌ Planned through a licensed partner. Not built |
-| Streaming payroll, merchant router and vault contracts | 🟡 Written and tested locally (10 Hardhat tests); **not deployed**. Shown as simulated demos |
+| Pay per second: `TempoPayrollStream` on Tempo testnet ([0x70d6…97af](https://explore.testnet.tempo.xyz/address/0x70d6e4df698adc0d91ab57a020877bc61e0597af)) | ✅ Funded in one transaction; every movement carries the stream label as its TIP-20 memo; contractor link to watch and withdraw; no owner or admin |
+| Merchant router and vault contracts | 🟡 Tested locally (Hardhat); not deployed. Shown as simulated demos |
 | Mainnet | ❌ Not used. Do not use with real funds; nothing is audited |
 
 ## 🏛️ How it works
@@ -107,6 +108,7 @@ node scripts/test-api-alerts.mjs    # alerts (start api-dev with --throwaway --a
 node scripts/test-api-limit-requests.mjs  # limit requests and approvals
 node scripts/test-api-invites.mjs   # contractor invites and onboarding
 node scripts/test-api-schedules.mjs # pay schedules, reminders and recorded runs
+node scripts/smoke-stream.mjs       # pay per second on the deployed stream contract
 ```
 The daily alert check and pay-run reminders run as a Vercel Cron job (`frontend/vercel.json`). Set `CRON_SECRET` in Vercel (any long random
 string) so only Vercel can trigger it.

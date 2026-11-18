@@ -13,6 +13,7 @@ import { SettlementModal } from './components/SettlementModal';
 import { actions, useWorkspace } from './store/useWorkspace';
 import { CompanySetup } from './components/control/CompanySetup';
 import { JoinPage } from './components/control/JoinPage';
+import { StreamPage } from './components/control/StreamPage';
 
 const HEADS = {
   overview: {
@@ -38,7 +39,10 @@ const fromHash = () => {
 /** Contractor invite links (#join=<code>) open a standalone page; everything else is the control panel. */
 export default function App() {
   const [joinCode] = useState(() => window.location.hash.match(/^#join=([A-Za-z0-9_.-]+)$/)?.[1] ?? null);
-  return joinCode ? <JoinPage code={joinCode} /> : <ControlApp />;
+  const [streamId] = useState(() => window.location.hash.match(/^#stream=(0x[0-9a-fA-F]{64})$/)?.[1] ?? null);
+  if (joinCode) return <JoinPage code={joinCode} />;
+  if (streamId) return <StreamPage id={streamId} />;
+  return <ControlApp />;
 }
 
 function ControlApp() {
