@@ -4,8 +4,14 @@
   "description": "Let an AI agent pay on Tempo with its own TempoFlow budget key: memo-tagged payments, budget checks and paid API calls (MPP).",
   "type": "module",
   "main": "src/index.js",
-  "exports": { ".": "./src/index.js" },
-  "files": ["src", "README.md"],
+  "exports": {
+    ".": "./src/index.js"
+  },
+  "files": [
+    "src",
+    "bin",
+    "README.md"
+  ],
   "license": "MIT",
   "scripts": {
     "test": "node test/smoke.mjs"
@@ -15,10 +21,15 @@
     "mppx": ">=0.16.0"
   },
   "peerDependenciesMeta": {
-    "mppx": { "optional": true }
+    "mppx": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "mppx": "0.16.0",
     "viem": "2.57.13"
+  },
+  "bin": {
+    "tempoflow-agent-keygen": "bin/keygen.mjs"
   }
 }

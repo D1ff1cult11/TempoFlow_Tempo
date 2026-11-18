@@ -63,13 +63,18 @@ export function generateAgentKey() {
  * @param {'testnet'|'mainnet'} [options.network] Defaults to 'testnet'.
  * @param {string} [options.relayUrl]             TempoFlow fee-payer relay (e.g. https://your-app/api/relay). Fees then don't use the budget.
  * @param {string} [options.rpcUrl]               Custom Tempo RPC URL.
+ * @param {`0x${string}`} [options.keyAddress]    The key address TempoFlow authorized; checked against privateKey.
  */
-export function createAgent({ privateKey, companyAddress, token, name = 'agent', network = 'testnet', relayUrl, rpcUrl }) {
+export function createAgent({ privateKey, companyAddress, token, name = 'agent', network = 'testnet', relayUrl, rpcUrl, keyAddress }) {
   if (!privateKey || !companyAddress || !token) throw new Error('privateKey, companyAddress and token are required');
   const chain = NETWORKS[network];
   if (!chain) throw new Error(`Unknown network "${network}"`);
 
   const account = Account.fromP256(privateKey, { access: companyAddress });
+  // Optional safety check: the key TempoFlow authorized (TEMPOFLOW_KEY_ADDRESS) must match the private key we hold.
+  if (keyAddress && keyAddress.toLowerCase() !== account.accessKeyAddress.toLowerCase()) {
+    throw new Error(`This private key belongs to ${account.accessKeyAddress}, but TempoFlow authorized ${keyAddress}.`);
+  }
   const rpc = http(rpcUrl);
   const client = createClient({ chain, transport: relayUrl ? withFeePayer(rpc, http(relayUrl)) : rpc })
     .extend(publicActions)
