@@ -33,7 +33,7 @@ Work is tracked as GitHub issues, grouped by milestone. Labels: `agents`, `payro
 - [x] Redesign: sidebar app, Overview page, 60/30/10 color system (graphite amber)
 - [x] Agent SDK (`packages/agent-sdk`): pay with a task memo, budget checks, paid APIs over MPP
 - [x] Hand-off of agent keys: generated in the agent runtime (`npx tempoflow-agent-keygen`); the panel only stores the key address
-- [ ] Alerts: webhook / email when an agent drops under 20% of its daily budget, hits a limit, or nears expiry
+- [x] Alerts by webhook (Slack, Discord, any https URL) when an agent runs low, hits its limit, or nears expiry; email later
 - [ ] Limit-raise requests and approvals (agent asks, admin approves, `updateLimit` on-chain)
 - [ ] Multiple admins per company (configurable accounts once available on testnet/mainnet)
 - [x] Ledger: database-backed history synced from chain; filters by type, agent, team and date

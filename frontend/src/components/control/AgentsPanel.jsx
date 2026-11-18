@@ -3,6 +3,7 @@ import { Bot, Plus, ShieldOff, Send, ArrowUpCircle, Users, Copy } from 'lucide-r
 import { useWorkspace, actions, teamAllocated } from '../../store/useWorkspace';
 import { TOKENS, DEFAULT_TOKEN, tokenSymbol, usd, remainingLimit, short } from '../../lib/tempo';
 import { AsyncButton, Result, AddressLink, TxLink, Field, Bar } from './ui';
+import { AlertsCard } from './AlertsCard';
 
 const isAddress = (a) => /^0x[0-9a-fA-F]{40}$/.test(a.trim());
 
@@ -414,6 +415,7 @@ export function AgentsPanel() {
   return (
     <div className="cp-stack">
       <TeamsCard />
+      <AlertsCard />
       <NewAgentCard />
       <div className="glass-panel cp-card cp-stack">
         <div className="cp-row" style={{ justifyContent: 'space-between' }}>

@@ -101,3 +101,10 @@ export function fetchLedger(filters = {}) {
   const q = new URLSearchParams(Object.entries(filters).filter(([, v]) => v !== '' && v != null));
   return call(`/api/ledger?${q}`);
 }
+
+// ---------- alerts (issue #6) ----------
+export const listAlerts = () => call('/api/alerts');
+export const addAlert = (rule) => call('/api/alerts', { method: 'POST', body: rule });
+export const deleteAlert = (id) => call(`/api/alerts?id=${encodeURIComponent(id)}`, { method: 'DELETE' });
+export const testAlert = (id) => call('/api/alerts', { method: 'POST', body: { action: 'test', id } });
+export const checkAlerts = () => call('/api/alerts', { method: 'POST', body: { action: 'check' } });
