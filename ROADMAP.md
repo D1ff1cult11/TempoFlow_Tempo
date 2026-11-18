@@ -36,7 +36,7 @@ Work is tracked as GitHub issues, grouped by milestone. Labels: `agents`, `payro
 - [ ] Alerts: webhook / email when an agent drops under 20% of its daily budget, hits a limit, or nears expiry
 - [ ] Limit-raise requests and approvals (agent asks, admin approves, `updateLimit` on-chain)
 - [ ] Multiple admins per company (configurable accounts once available on testnet/mainnet)
-- [ ] Ledger: indexer-backed history instead of browser log scans; filters by team, agent, task
+- [x] Ledger: database-backed history synced from chain; filters by type, agent, team and date
 - [ ] Accounting export formats (QuickBooks / Xero CSV)
 
 ## M3: People payouts for real

@@ -32,6 +32,7 @@ data, compute and services on their own). TempoFlow is the control panel for bot
 | Agent budgets: authorize, live remaining limit, change limit, revoke, team caps | ✅ **Live on Tempo testnet** (`viem/tempo` access keys) |
 | Pay runs: batched transfers with invoice memos | ✅ **Live on Tempo testnet** |
 | Ledger rebuilt from chain + CSV export | ✅ **Live on Tempo testnet** |
+| Database ledger: full history, filters by type/agent/team/date | ✅ Supabase Postgres, synced from chain; sign in by signing a message (passkey or key), no passwords |
 | Stablecoin conversion via the Stablecoin DEX | ✅ **Live on Tempo testnet** |
 | Fee sponsorship | ✅ **Server-side** fee-payer relay (`frontend/api/relay.mjs`, a Vercel function). The sponsor key lives only in the server environment; the relay only sponsors stablecoin (TIP-20) calls on testnet |
 | Company account | 🟡 Passkey (WebAuthn) or a throwaway test key, stored in your browser. Testnet only |
@@ -73,7 +74,7 @@ The UI uses one dark "graphite amber" theme on a 60/30/10 color system (see `fro
 ### Fee sponsorship (optional)
 Locally, run the relay next to the app. `--throwaway` uses a fresh in-memory testnet key funded by the faucet:
 ```bash
-node scripts/relay-dev.mjs --throwaway
+node scripts/api-dev.mjs --throwaway
 ```
 On Vercel, create a testnet sponsor key with `node scripts/new-sponsor-key.mjs` and add it as the environment
 variable `TEMPO_SPONSOR_PRIVATE_KEY`. Without it, the app still works and agents pay their own fees.
@@ -87,6 +88,19 @@ node scripts/smoke-payrun.mjs         # 3 payouts in 1 sponsored transaction, DE
 node scripts/smoke-relay.mjs          # server relay sponsors an agent payment; policy refuses other calls
 node scripts/smoke-key-handoff.mjs    # agent makes its own key; app authorizes only the address; agent pays
 ```
+
+### Database (optional)
+Server features (full ledger history and filters, and later alerts, approvals, onboarding and schedules) use Postgres,
+for example Supabase connected through Vercel → Storage. Vercel then provides `POSTGRES_URL`. Locally, put the same
+values in `frontend/.env.local` (git-ignored), then:
+```bash
+cd frontend
+node db/migrate.mjs                 # creates the tables (safe to re-run; Row Level Security on)
+node ../scripts/api-dev.mjs          # local stand-in for the Vercel functions (in another terminal)
+node scripts/test-api-session.mjs   # sign-in tests
+node scripts/test-api-ledger.mjs    # database ledger tests against testnet
+```
+Sign-in sessions are signed with `TEMPOFLOW_SESSION_SECRET` (or the Supabase integration's `SUPABASE_JWT_SECRET`).
 
 ### Contracts (streaming payroll, merchant router, vault)
 ```bash
@@ -105,7 +119,8 @@ npx hardhat test
 | `frontend/src/components/control/` | Control panel screens (Overview, Agents, People, Ledger, Treasury) |
 | `frontend/src/components/layout/` | Sidebar app shell, bottom navigation on phones, theme switch |
 | `frontend/src/index.css` | Design tokens: 60/30/10 color system (graphite amber) |
-| `frontend/api/` | Vercel serverless fee-payer relay (Vercel builds from `frontend/`) |
+| `frontend/api/` | Vercel functions: fee-payer relay, sign-in, ledger sync and queries (Vercel builds from `frontend/`) |
+| `frontend/db/` | Database schema and migration script |
 | `packages/agent-sdk/` | `@tempoflow/agent`: what an agent runs to pay, check its budget and call paid (MPP) APIs |
 | `frontend/scripts/` | Testnet smoke tests |
 | `contracts/` | `TempoFlowRouter`, `TempoPayrollStream`, `MerchantSettlementVault` (+ mocks) |
