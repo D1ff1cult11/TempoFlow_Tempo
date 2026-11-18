@@ -43,7 +43,7 @@ Work is tracked as GitHub issues, grouped by milestone. Labels: `agents`, `payro
 
 - [ ] Choose a licensed partner for KYC/KYB, cash-out and local rails (candidates: Bridge, BlindPay, Zero Hash)
 - [x] Contractor self-onboarding by invite link: wallet pasted or created with a passkey, approved by an admin (bank details via a partner later)
-- [ ] Scheduled pay runs; partial failures impossible (single batched transaction)
+- [x] Scheduled pay runs: reminders on the due date and one-click batched payment (no server-held keys; autopay with a limited payroll key is a possible later option)
 - [ ] Deploy `TempoPayrollStream` to testnet using TIP-20 + memos, as the "pay per second" option
 - [ ] Private payroll with Tempo Zones
 

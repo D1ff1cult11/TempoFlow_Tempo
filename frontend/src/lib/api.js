@@ -121,3 +121,10 @@ export const viewJoin = (code) => call(`/api/join?code=${encodeURIComponent(code
 export const submitJoin = (body) => call('/api/join', { method: 'POST', body });
 /** Must match joinMessage() in frontend/api/join.mjs. */
 export const joinMessage = (inviteId, wallet) => `TempoFlow: join as a contractor\n\nInvite: ${inviteId}\nWallet: ${String(wallet).toLowerCase()}`;
+
+// ---------- scheduled pay runs, reminder model (issue #13) ----------
+export const listSchedules = () => call('/api/schedules');
+export const createSchedule = (s) => call('/api/schedules', { method: 'POST', body: s });
+export const remindSchedules = () => call('/api/schedules', { method: 'POST', body: { action: 'remind' } });
+export const markRunPaid = (scheduleId, period, tx, total) => call('/api/schedules', { method: 'PATCH', body: { scheduleId, period, tx, total } });
+export const deleteSchedule = (id) => call(`/api/schedules?id=${encodeURIComponent(id)}`, { method: 'DELETE' });
