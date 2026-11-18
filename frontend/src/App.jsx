@@ -12,6 +12,7 @@ import { TreasuryVault } from './components/TreasuryVault';
 import { SettlementModal } from './components/SettlementModal';
 import { actions, useWorkspace } from './store/useWorkspace';
 import { CompanySetup } from './components/control/CompanySetup';
+import { JoinPage } from './components/control/JoinPage';
 
 const HEADS = {
   overview: {
@@ -34,7 +35,13 @@ const fromHash = () => {
   return ALL.includes(h) ? h : 'overview';
 };
 
+/** Contractor invite links (#join=<code>) open a standalone page; everything else is the control panel. */
 export default function App() {
+  const [joinCode] = useState(() => window.location.hash.match(/^#join=([A-Za-z0-9_.-]+)$/)?.[1] ?? null);
+  return joinCode ? <JoinPage code={joinCode} /> : <ControlApp />;
+}
+
+function ControlApp() {
   const [page, setPage] = useState(fromHash);
   const ws = useWorkspace();
 

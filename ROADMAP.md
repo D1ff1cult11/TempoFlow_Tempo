@@ -42,7 +42,7 @@ Work is tracked as GitHub issues, grouped by milestone. Labels: `agents`, `payro
 ## M3: People payouts for real
 
 - [ ] Choose a licensed partner for KYC/KYB, cash-out and local rails (candidates: Bridge, BlindPay, Zero Hash)
-- [ ] Contractor self-onboarding (wallet or bank details via partner)
+- [x] Contractor self-onboarding by invite link: wallet pasted or created with a passkey, approved by an admin (bank details via a partner later)
 - [ ] Scheduled pay runs; partial failures impossible (single batched transaction)
 - [ ] Deploy `TempoPayrollStream` to testnet using TIP-20 + memos, as the "pay per second" option
 - [ ] Private payroll with Tempo Zones
