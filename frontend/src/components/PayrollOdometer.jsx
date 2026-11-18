@@ -37,7 +37,7 @@ export function PayrollOdometer() {
         right: '-40px',
         width: '180px',
         height: '180px',
-        background: 'radial-gradient(circle, rgba(0, 210, 106, 0.15) 0%, transparent 70%)',
+        background: 'none',
         pointerEvents: 'none',
       }} />
 
@@ -48,7 +48,7 @@ export function PayrollOdometer() {
             width: '36px',
             height: '36px',
             borderRadius: '10px',
-            background: 'rgba(0, 240, 255, 0.12)',
+            background: 'color-mix(in srgb, var(--accent) 12%, transparent)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -57,7 +57,7 @@ export function PayrollOdometer() {
             <Timer size={20} />
           </div>
           <div>
-            <h3 style={{ fontSize: '1.15rem', fontWeight: 800, fontFamily: 'var(--font-sans)', color: '#FFFFFF' }}>
+            <h3 style={{ fontSize: '1.15rem', fontWeight: 800, fontFamily: 'var(--font-sans)', color: 'var(--text)' }}>
               Streaming Payroll
             </h3>
             <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
@@ -76,13 +76,13 @@ export function PayrollOdometer() {
 
       {/* The Odometer Display */}
       <div style={{
-        background: 'linear-gradient(180deg, rgba(11, 15, 23, 0.9) 0%, rgba(6, 8, 13, 0.95) 100%)',
-        border: '1px solid rgba(0, 210, 106, 0.3)',
+        background: 'var(--surface)',
+        border: '1px solid color-mix(in srgb, var(--accent) 30%, transparent)',
         borderRadius: '16px',
         padding: '28px 24px',
         textAlign: 'center',
         marginBottom: '24px',
-        boxShadow: '0 0 30px rgba(0, 210, 106, 0.12)',
+        boxShadow: 'none',
       }}>
         <div style={{ fontSize: '0.82rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '6px' }}>
           Accrued Unclaimed Earnings
@@ -93,9 +93,9 @@ export function PayrollOdometer() {
           fontSize: 'clamp(2.4rem, 6vw, 3.8rem)',
           fontWeight: 800,
           fontFamily: 'var(--font-mono)',
-          color: '#FFFFFF',
+          color: 'var(--text)',
           letterSpacing: '-0.02em',
-          textShadow: '0 0 24px rgba(0, 210, 106, 0.4)',
+          textShadow: 'none',
         }}>
           $<span style={{ color: 'var(--tempo-emerald)' }}>
             {streamClaimableBalance.toFixed(6)}
@@ -115,7 +115,7 @@ export function PayrollOdometer() {
           color: 'var(--text-muted)',
           fontFamily: 'var(--font-mono)',
         }}>
-          <TrendingUp size={14} color="var(--tempo-cyan)" />
+          <TrendingUp size={14} color="var(--accent-text)" />
           Flow Velocity: ${(streamRatePerSecond * 3600).toFixed(2)} / hour • $0.003805 / sec
         </div>
       </div>
@@ -129,7 +129,7 @@ export function PayrollOdometer() {
       }}>
         <div style={{ background: 'rgba(255, 255, 255, 0.03)', padding: '12px 14px', borderRadius: '10px', border: '1px solid var(--border-subtle)' }}>
           <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Annualized Wage</div>
-          <div style={{ fontSize: '1.1rem', fontWeight: 700, fontFamily: 'var(--font-mono)', color: '#FFFFFF', marginTop: '2px' }}>
+          <div style={{ fontSize: '1.1rem', fontWeight: 700, fontFamily: 'var(--font-mono)', color: 'var(--text)', marginTop: '2px' }}>
             $120,000 / yr
           </div>
         </div>
@@ -143,7 +143,7 @@ export function PayrollOdometer() {
 
         <div style={{ background: 'rgba(255, 255, 255, 0.03)', padding: '12px 14px', borderRadius: '10px', border: '1px solid var(--border-subtle)' }}>
           <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Remaining Escrow</div>
-          <div style={{ fontSize: '1.1rem', fontWeight: 700, fontFamily: 'var(--font-mono)', color: '#FFFFFF', marginTop: '2px' }}>
+          <div style={{ fontSize: '1.1rem', fontWeight: 700, fontFamily: 'var(--font-mono)', color: 'var(--text)', marginTop: '2px' }}>
             ${streamRemainingEscrow.toFixed(2)}
           </div>
         </div>
@@ -167,8 +167,8 @@ export function PayrollOdometer() {
             justifyContent: 'center',
             padding: '14px 20px',
             fontSize: '1rem',
-            background: !isDemoMode ? 'linear-gradient(135deg, #00D26A 0%, #00F0FF 100%)' : undefined,
-            color: !isDemoMode ? '#07090E' : undefined,
+            background: !isDemoMode ? 'var(--accent)' : undefined,
+            color: !isDemoMode ? 'var(--accent-ink)' : undefined,
             fontWeight: 700,
           }}
         >
@@ -181,7 +181,7 @@ export function PayrollOdometer() {
         <button
           onClick={() => simulateTimeWarp(24)}
           className="btn-secondary"
-          style={{ flex: 1, justifyContent: 'center', borderColor: 'rgba(0, 240, 255, 0.4)', color: 'var(--tempo-cyan)' }}
+          style={{ flex: 1, justifyContent: 'center', borderColor: 'color-mix(in srgb, var(--accent) 40%, transparent)', color: 'var(--tempo-cyan)' }}
         >
           <FastForward size={16} />
           Fast-Forward 24H (+$240)

@@ -1,164 +1,80 @@
-import React, { useState } from 'react';
-import { Navbar } from './components/Navbar';
+import React, { useEffect, useState } from 'react';
+import { AppShell, PageHead, PAGES, EXTRA_PAGES } from './components/layout/AppShell';
+import { Overview } from './components/control/Overview';
+import { AgentsPanel } from './components/control/AgentsPanel';
+import { PeoplePanel } from './components/control/PeoplePanel';
+import { LedgerPanel } from './components/control/LedgerPanel';
+import { TreasuryPanel } from './components/control/TreasuryPanel';
 import { DemoBanner } from './components/DemoBanner';
 import { MerchantTerminal } from './components/MerchantTerminal';
 import { PayrollOdometer } from './components/PayrollOdometer';
 import { TreasuryVault } from './components/TreasuryVault';
-import { CrossChainRelay } from './components/CrossChainRelay';
 import { SettlementModal } from './components/SettlementModal';
-import { Store, Timer, ExternalLink, Github, BookOpen, Award, Vault } from 'lucide-react';
+import { actions, useWorkspace } from './store/useWorkspace';
+import { CompanySetup } from './components/control/CompanySetup';
+
+const HEADS = {
+  overview: {
+    title: 'One treasury for your people and your AI agents',
+    sub: 'Budgets enforced by Tempo, batched pay runs and one ledger. Live on Tempo testnet with free test stablecoins.',
+  },
+  agents: {
+    title: 'Agents',
+    sub: 'Each agent gets its own key with a daily limit, allowed payees and an expiry. Tempo rejects anything outside them.',
+  },
+  people: { title: 'People', sub: 'Pay contractors in one transaction, each payout tagged with its invoice number.' },
+  ledger: { title: 'Ledger', sub: 'Every payment from your treasury, rebuilt from the chain and matched to the agent or person.' },
+  treasury: { title: 'Treasury', sub: 'Convert between stablecoins at live rates from Tempo’s built-in exchange.' },
+  demos: { title: 'Prototype demos', sub: 'Earlier ideas, fully simulated in your browser. Their contracts are not deployed.' },
+};
+
+const ALL = [...PAGES, ...EXTRA_PAGES].map((p) => p.id);
+const fromHash = () => {
+  const h = window.location.hash.replace('#', '');
+  return ALL.includes(h) ? h : 'overview';
+};
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState('ALL'); // 'ALL' | 'MERCHANT' | 'PAYROLL' | 'TREASURY'
+  const [page, setPage] = useState(fromHash);
+  const ws = useWorkspace();
+
+  useEffect(() => {
+    actions.checkRelay();
+    const onHash = () => setPage(fromHash());
+    window.addEventListener('hashchange', onHash);
+    return () => window.removeEventListener('hashchange', onHash);
+  }, []);
+
+  const navigate = (id) => {
+    setPage(id);
+    history.replaceState(null, '', `#${id}`);
+    window.scrollTo({ top: 0 });
+  };
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-      {/* 1. Header & Live Telemetry Navbar */}
-      <Navbar />
-
-      {/* 2. Top sticky demo simulation bar */}
-      <DemoBanner />
-
-      {/* 3. Main Protocol Terminal Workspace */}
-      <main style={{ maxWidth: '1280px', width: '100%', margin: '0 auto', padding: '24px', flex: 1 }}>
-        {/* Hero Value Proposition Card */}
-        <div style={{
-          marginBottom: '28px',
-          padding: '24px 28px',
-          background: 'linear-gradient(135deg, rgba(15, 21, 32, 0.8) 0%, rgba(11, 15, 23, 0.9) 100%)',
-          borderRadius: '16px',
-          border: '1px solid var(--border-subtle)',
-          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)',
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px' }}>
-            <div>
-              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-                <span className="badge-pill badge-emerald">Tempo L1 Ecosystem</span>
-                <span className="badge-pill badge-solana">Solana Retail Ingress</span>
-              </div>
-              <h1 style={{
-                fontSize: 'clamp(1.5rem, 3.5vw, 2.2rem)',
-                fontWeight: 800,
-                fontFamily: 'var(--font-sans)',
-                letterSpacing: '-0.02em',
-                lineHeight: 1.2,
-              }}>
-                Stablecoin payments &amp; payroll on Tempo
-              </h1>
-              <p style={{
-                fontSize: '0.92rem',
-                color: 'var(--text-muted)',
-                marginTop: '8px',
-                maxWidth: '780px',
-                lineHeight: 1.5,
-              }}>
-                Accept stablecoin payments with a <strong>10 bps protocol fee</strong>, convert between currencies, and stream contractor salaries that accrue every second. Early prototype: in Demo Mode everything below is simulated.
-              </p>
-            </div>
-
-            {/* Quick Portal Switcher Tabs */}
-            <div style={{ display: 'flex', gap: '8px' }}>
-              <button
-                onClick={() => setActiveTab('ALL')}
-                className={activeTab === 'ALL' ? 'btn-primary' : 'btn-secondary'}
-                style={{ fontSize: '0.85rem' }}
-              >
-                All Systems View
-              </button>
-              <button
-                onClick={() => setActiveTab('MERCHANT')}
-                className={activeTab === 'MERCHANT' ? 'btn-primary' : 'btn-secondary'}
-                style={{ fontSize: '0.85rem' }}
-              >
-                <Store size={15} />
-                Merchant POS
-              </button>
-              <button
-                onClick={() => setActiveTab('PAYROLL')}
-                className={activeTab === 'PAYROLL' ? 'btn-primary' : 'btn-secondary'}
-                style={{ fontSize: '0.85rem' }}
-              >
-                <Timer size={15} />
-                Payroll Odometer
-              </button>
-              <button
-                onClick={() => setActiveTab('TREASURY')}
-                className={activeTab === 'TREASURY' ? 'btn-primary' : 'btn-secondary'}
-                style={{ fontSize: '0.85rem' }}
-              >
-                <Vault size={15} />
-                Treasury Vault
-              </button>
-            </div>
+    <AppShell page={page} onNavigate={navigate}>
+      {page === 'demos' && <DemoBanner />}
+      <main className="page">
+        <PageHead title={HEADS[page].title} sub={HEADS[page].sub} />
+        {!ws.company && !['overview', 'demos'].includes(page) && (
+          <div style={{ marginBottom: 20 }}>
+            <CompanySetup />
           </div>
-        </div>
-
-        {/* 4. Cross-Chain Telemetry Pipeline Visualizer */}
-        <CrossChainRelay />
-
-        {/* 5. Core Portals Grid */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '28px' }}>
-          {(activeTab === 'ALL' || activeTab === 'MERCHANT') && (
-            <section>
-              <MerchantTerminal />
-            </section>
-          )}
-
-          {(activeTab === 'ALL' || activeTab === 'PAYROLL') && (
-            <section>
-              <PayrollOdometer />
-            </section>
-          )}
-
-          {(activeTab === 'ALL' || activeTab === 'TREASURY') && (
-            <section>
-              <TreasuryVault />
-            </section>
-          )}
-        </div>
+        )}
+        {page === 'overview' && <Overview onNavigate={navigate} />}
+        {page === 'agents' && <AgentsPanel />}
+        {page === 'people' && <PeoplePanel />}
+        {page === 'ledger' && <LedgerPanel />}
+        {page === 'treasury' && <TreasuryPanel />}
+        {page === 'demos' && (
+          <div className="cp-stack" style={{ gap: 24 }}>
+            <MerchantTerminal />
+            <PayrollOdometer />
+            <TreasuryVault />
+          </div>
+        )}
       </main>
-
-      {/* 6. Cryptographic Settlement Receipt Modal */}
       <SettlementModal />
-
-      {/* 7. Footer */}
-      <footer style={{
-        borderTop: '1px solid var(--border-subtle)',
-        background: 'rgba(6, 8, 13, 0.95)',
-        padding: '24px',
-        marginTop: '40px',
-        fontSize: '0.82rem',
-        color: 'var(--text-dim)',
-      }}>
-        <div style={{
-          maxWidth: '1280px',
-          margin: '0 auto',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          flexWrap: 'wrap',
-          gap: '16px',
-        }}>
-          <div>
-            <strong>TempoFlow</strong> • Stablecoin payments & streaming payroll on Tempo
-          </div>
-
-          <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-            <a
-              href="https://github.com/D1ff1cult11/TempoFlow_Tempo"
-              target="_blank"
-              rel="noreferrer"
-              style={{ color: 'var(--text-muted)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '6px' }}
-            >
-              <Github size={15} />
-              GitHub Repository
-            </a>
-            <span style={{ color: 'var(--tempo-emerald)' }}>
-              MIT Licensed Public Good
-            </span>
-          </div>
-        </div>
-      </footer>
-    </div>
+    </AppShell>
   );
 }

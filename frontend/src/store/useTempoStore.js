@@ -1,6 +1,11 @@
 import { useState, useEffect } from 'react';
 import confetti from 'canvas-confetti';
 import { sound } from '../audio/soundEffects';
+
+const themeConfetti = () => {
+  const css = getComputedStyle(document.documentElement);
+  return [css.getPropertyValue('--accent').trim() || '#f5a623', css.getPropertyValue('--text').trim() || '#ededed'];
+};
 import { CONTRACT_ADDRESSES, ERC20_ABI, ROUTER_ABI, PAYROLL_ABI, VAULT_ABI, NETWORK_CONFIG } from '../config/contracts';
 import { ethers } from 'ethers';
 
@@ -38,8 +43,8 @@ let state = {
     {
       id: 'tx-init-1',
       hash: '0x9a8f...3c21',
-      type: 'Solana Pay Ingress',
-      from: 'Solana: 7Yv...92x',
+      type: 'Customer Payment (simulated)',
+      from: 'Customer: 0x7Yv...92x',
       to: 'Tempo: Merchant Vault',
       amountIn: '50.00 USDC',
       amountOut: '45.95 EURC (FX 0.92)',
@@ -146,8 +151,8 @@ export function useTempoStore() {
     const newTx = {
       id: 'tx-' + Date.now(),
       hash: orderHash,
-      type: 'Solana Payment (simulated)',
-      from: 'Phantom: 8Hq...41m',
+      type: 'Customer Payment (simulated)',
+      from: 'Customer: 0x8Hq...41m',
       to: 'Tempo: Merchant Vault',
       amountIn: `${amount.toFixed(2)} USDC`,
       amountOut: `${finalAmount.toFixed(2)} ${tokenSymbol} ${isFX ? '(mock FX rate)' : ''}`,
@@ -164,7 +169,7 @@ export function useTempoStore() {
       particleCount: 80,
       spread: 70,
       origin: { y: 0.6 },
-      colors: ['#00D26A', '#00F0FF', '#9945FF'],
+      colors: themeConfetti(),
     });
 
     state.activeReceipt = newTx;
@@ -184,7 +189,7 @@ export function useTempoStore() {
       particleCount: 50,
       spread: 50,
       origin: { y: 0.7 },
-      colors: ['#00F0FF', '#00D26A'],
+      colors: themeConfetti(),
     });
 
     emit();
@@ -202,7 +207,7 @@ export function useTempoStore() {
       particleCount: 100,
       spread: 90,
       origin: { y: 0.5 },
-      colors: ['#00D26A', '#F97316', '#00F0FF'],
+      colors: themeConfetti(),
     });
 
     emit();
@@ -252,7 +257,7 @@ export function useTempoStore() {
         state.walletBalanceEURC += state.merchantVaultEURC;
         state.merchantVaultEURC = 0;
       }
-      confetti({ particleCount: 60, spread: 60, origin: { y: 0.6 }, colors: ['#00D26A', '#00F0FF'] });
+      confetti({ particleCount: 60, spread: 60, origin: { y: 0.6 }, colors: themeConfetti() });
       emit();
       return;
     }
@@ -289,7 +294,7 @@ export function useTempoStore() {
       }
 
       sound.playCashChime();
-      confetti({ particleCount: 60, spread: 60, origin: { y: 0.6 }, colors: ['#00D26A', '#00F0FF'] });
+      confetti({ particleCount: 60, spread: 60, origin: { y: 0.6 }, colors: themeConfetti() });
     } catch (err) {
       console.error('Vault withdraw failed:', err);
       alert('Withdraw failed: ' + (err.reason || err.message));
@@ -396,7 +401,7 @@ export function useTempoStore() {
       const accounts = await provider.send('eth_requestAccounts', []);
       state.connectedAddress = accounts[0];
 
-      // Attempt to switch to Tempo Testnet (4242)
+      // Attempt to switch to Tempo Testnet (Moderato, 42431)
       try {
         await window.ethereum.request({
           method: 'wallet_switchEthereumChain',
@@ -523,7 +528,7 @@ export function useTempoStore() {
         id: 'tx-' + Date.now(),
         hash: receipt.hash.slice(0, 10) + '...' + receipt.hash.slice(-6),
         fullHash: receipt.hash,
-        explorerUrl: `https://explorer.testnet.tempo.xyz/tx/${receipt.hash}`,
+        explorerUrl: `https://explore.testnet.tempo.xyz/tx/${receipt.hash}`,
         type: 'Tempo (On-Chain)',
         from: state.connectedAddress.slice(0, 6) + '...' + state.connectedAddress.slice(-4),
         to: 'Merchant Vault (' + CONTRACT_ADDRESSES.MerchantSettlementVault.slice(0, 6) + '...)',
@@ -543,7 +548,7 @@ export function useTempoStore() {
         particleCount: 100,
         spread: 80,
         origin: { y: 0.6 },
-        colors: ['#00D26A', '#00F0FF', '#9945FF'],
+        colors: themeConfetti(),
       });
 
       await refreshOnChainBalances();
@@ -574,7 +579,7 @@ export function useTempoStore() {
 
       sound.playClaimChime();
       state.streamClaimableBalance = 0.000001;
-      confetti({ particleCount: 100, spread: 80, origin: { y: 0.5 }, colors: ['#00D26A', '#F97316'] });
+      confetti({ particleCount: 100, spread: 80, origin: { y: 0.5 }, colors: themeConfetti() });
       await refreshOnChainBalances();
       emit();
     } catch (err) {

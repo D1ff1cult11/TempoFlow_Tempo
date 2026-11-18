@@ -5,7 +5,7 @@ import { Store, QrCode, ArrowDownRight, RefreshCw, CheckCircle, ExternalLink, Za
 
 export function MerchantTerminal() {
   const [posAmount, setPosAmount] = useState('50.00');
-  const [qrTab, setQrTab] = useState('SOLANA'); // 'SOLANA' | 'TEMPO'
+  const [qrTab, setQrTab] = useState('TEMPO');
   const [qrDataUrl, setQrDataUrl] = useState('');
   const qrCanvasRef = useRef(null);
 
@@ -24,16 +24,14 @@ export function MerchantTerminal() {
 
   // Generate real dynamic QR code whenever amount or tab changes
   useEffect(() => {
-    const payload = qrTab === 'SOLANA'
-      ? `solana:TempoF1owIngress111111111111111111111111111?amount=${posAmount}&spl-token=EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v&reference=TEMPO-${Date.now()}`
-      : `ethereum:0x0165878A594ca255338adfa4d48449f69242Eb8F@4242?value=${posAmount}&token=USDC`;
+    const payload = `ethereum:0x0165878A594ca255338adfa4d48449f69242Eb8F@42431?value=${posAmount}&token=USDC`;
 
     QRCode.toDataURL(payload, {
       width: 180,
       margin: 1,
       color: {
-        dark: qrTab === 'SOLANA' ? '#9945FF' : '#00D26A',
-        light: '#07090E',
+        dark: '#0E1015',
+        light: '#FFFFFF',
       },
     })
       .then((url) => setQrDataUrl(url))
@@ -50,7 +48,7 @@ export function MerchantTerminal() {
               width: '34px',
               height: '34px',
               borderRadius: '8px',
-              background: 'rgba(0, 210, 106, 0.15)',
+              background: 'color-mix(in srgb, var(--accent) 15%, transparent)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -63,7 +61,7 @@ export function MerchantTerminal() {
                 Merchant Point-of-Sale
               </h3>
               <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
-                Accept stablecoin payments on Tempo (Solana intake simulated)
+                Accept stablecoin payments on Tempo (simulated)
               </p>
             </div>
           </div>
@@ -97,7 +95,7 @@ export function MerchantTerminal() {
                 fontSize: '0.8rem',
                 fontWeight: 600,
                 background: selectedSettleCurrency === 'USDC' ? 'var(--tempo-emerald)' : 'rgba(255, 255, 255, 0.06)',
-                color: selectedSettleCurrency === 'USDC' ? '#06080D' : 'var(--text-muted)',
+                color: selectedSettleCurrency === 'USDC' ? 'var(--accent-ink)' : 'var(--text-muted)',
               }}
             >
               💵 Settle in USD (USDC)
@@ -114,7 +112,7 @@ export function MerchantTerminal() {
                 fontSize: '0.8rem',
                 fontWeight: 600,
                 background: selectedSettleCurrency === 'EURC' ? 'var(--tempo-cyan)' : 'rgba(255, 255, 255, 0.06)',
-                color: selectedSettleCurrency === 'EURC' ? '#06080D' : 'var(--text-muted)',
+                color: selectedSettleCurrency === 'EURC' ? 'var(--accent-ink)' : 'var(--text-muted)',
               }}
             >
               💶 Auto-Convert EUR (EURC)
@@ -147,7 +145,7 @@ export function MerchantTerminal() {
                 background: 'rgba(0, 0, 0, 0.3)',
                 border: '1px solid var(--border-subtle)',
                 borderRadius: '8px',
-                color: '#FFFFFF',
+                color: 'var(--text)',
                 fontFamily: 'var(--font-mono)',
                 fontSize: '1.25rem',
                 fontWeight: 700,
@@ -189,22 +187,6 @@ export function MerchantTerminal() {
         }}>
           <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', marginBottom: '12px' }}>
             <button
-              onClick={() => setQrTab('SOLANA')}
-              style={{
-                padding: '4px 12px',
-                borderRadius: '6px',
-                border: 'none',
-                cursor: 'pointer',
-                fontSize: '0.75rem',
-                fontWeight: 700,
-                background: qrTab === 'SOLANA' ? 'rgba(153, 69, 255, 0.25)' : 'transparent',
-                color: qrTab === 'SOLANA' ? '#C084FC' : 'var(--text-muted)',
-                borderBottom: qrTab === 'SOLANA' ? '2px solid #9945FF' : '2px solid transparent',
-              }}
-            >
-              Solana Pay (Phantom)
-            </button>
-            <button
               onClick={() => setQrTab('TEMPO')}
               style={{
                 padding: '4px 12px',
@@ -213,7 +195,7 @@ export function MerchantTerminal() {
                 cursor: 'pointer',
                 fontSize: '0.75rem',
                 fontWeight: 700,
-                background: qrTab === 'TEMPO' ? 'rgba(0, 210, 106, 0.25)' : 'transparent',
+                background: qrTab === 'TEMPO' ? 'color-mix(in srgb, var(--accent) 25%, transparent)' : 'transparent',
                 color: qrTab === 'TEMPO' ? 'var(--tempo-emerald)' : 'var(--text-muted)',
                 borderBottom: qrTab === 'TEMPO' ? '2px solid var(--tempo-emerald)' : '2px solid transparent',
               }}
@@ -223,7 +205,7 @@ export function MerchantTerminal() {
           </div>
 
           {qrDataUrl && (
-            <div style={{ display: 'inline-block', padding: '8px', background: '#07090E', borderRadius: '10px' }}>
+            <div style={{ display: 'inline-block', padding: '8px', background: 'var(--accent-ink)', borderRadius: '10px' }}>
               <img src={qrDataUrl} alt="Payment QR Code" style={{ display: 'block', borderRadius: '6px' }} />
             </div>
           )}
@@ -237,7 +219,7 @@ export function MerchantTerminal() {
         {!isDemoMode && !connectedAddress ? (
           <button
             onClick={connectWallet}
-            className="btn-action-solana"
+            className="btn-primary"
             style={{ width: '100%', justifyContent: 'center', padding: '12px' }}
           >
             <Zap size={18} />
@@ -252,8 +234,8 @@ export function MerchantTerminal() {
               width: '100%',
               justifyContent: 'center',
               padding: '12px',
-              background: !isDemoMode ? 'linear-gradient(135deg, #00D26A 0%, #00F0FF 100%)' : undefined,
-              color: !isDemoMode ? '#07090E' : undefined,
+              background: !isDemoMode ? 'var(--accent)' : undefined,
+              color: !isDemoMode ? 'var(--accent-ink)' : undefined,
               fontWeight: 700,
             }}
           >
@@ -291,8 +273,8 @@ export function MerchantTerminal() {
         {/* Treasury Balances Cards */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '20px' }}>
           <div style={{
-            background: 'rgba(0, 210, 106, 0.06)',
-            border: '1px solid rgba(0, 210, 106, 0.2)',
+            background: 'color-mix(in srgb, var(--accent) 6%, transparent)',
+            border: '1px solid color-mix(in srgb, var(--accent) 20%, transparent)',
             borderRadius: '10px',
             padding: '14px',
           }}>
@@ -312,8 +294,8 @@ export function MerchantTerminal() {
           </div>
 
           <div style={{
-            background: 'rgba(0, 240, 255, 0.06)',
-            border: '1px solid rgba(0, 240, 255, 0.2)',
+            background: 'color-mix(in srgb, var(--accent) 6%, transparent)',
+            border: '1px solid color-mix(in srgb, var(--accent) 20%, transparent)',
             borderRadius: '10px',
             padding: '14px',
           }}>
@@ -336,7 +318,7 @@ export function MerchantTerminal() {
         {/* Live Incoming Settlement Stream Ticker */}
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
-            <span style={{ fontSize: '0.82rem', fontWeight: 700, color: '#FFFFFF', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <span style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--text)', display: 'flex', alignItems: 'center', gap: '6px' }}>
               <RefreshCw size={14} className="pulse-dot" style={{ display: 'inline-block' }} />
               Settlement Feed (simulated)
             </span>
@@ -366,7 +348,7 @@ export function MerchantTerminal() {
               >
                 <div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span style={{ fontSize: '0.82rem', fontWeight: 600, color: '#FFFFFF' }}>{tx.amountIn}</span>
+                    <span style={{ fontSize: '0.82rem', fontWeight: 600, color: 'var(--text)' }}>{tx.amountIn}</span>
                     <span style={{ fontSize: '0.72rem', color: 'var(--tempo-cyan)' }}>→ {tx.amountOut}</span>
                   </div>
                   <div style={{ fontSize: '0.7rem', color: 'var(--text-dim)', fontFamily: 'var(--font-mono)' }}>
