@@ -16,6 +16,7 @@ const EMPTY = {
   ],
   agents: [], // { id, name, teamId, token, dailyLimit, recipients[], expiryDays, privateKey, keyAddress, status, authTx, authBlock, createdAt }
   contractors: [], // { id, name, address, amount, role }
+  streams: [], // { id (bytes32), label, name, employee, token, amount, days, hash, createdAt, status }
   ledger: [], // local log of actions taken from this panel: { id, at, kind, label, amount, token, hash, memo }
 };
 
@@ -191,6 +192,32 @@ export const actions = {
 
   removeContractor(id) {
     set((s) => ({ contractors: s.contractors.filter((c) => c.id !== id) }));
+  },
+
+  /** Pay per second (issue #14): funds a stream in one transaction; the label is the on-chain memo. */
+  async startStream({ contractor, amount, days, token }) {
+    const slug = contractor.name.toLowerCase().replace(/[^a-z0-9]+/g, '').slice(0, 10) || 'pay';
+    const label = `S-${new Date().toISOString().slice(0, 7)}-${slug}-${Math.random().toString(36).slice(2, 6)}`;
+    const { id, hash } = await T.createStream({
+      company: state.company,
+      employee: contractor.address,
+      token,
+      amount,
+      durationSeconds: Math.round(Number(days) * 86_400),
+      label,
+    });
+    const stream = { id, label, name: contractor.name, employee: contractor.address, token, amount: Number(amount), days: Number(days), hash, createdAt: Date.now(), status: 'active' };
+    set((s) => ({ streams: [stream, ...s.streams] }));
+    log({ kind: 'payroll', label: `Started paying ${contractor.name} per second (${T.usd(amount)} over ${days} days)`, amount: Number(amount), token, hash, memo: label });
+    return hash;
+  },
+
+  async stopStream(id) {
+    const stream = state.streams.find((x) => x.id === id);
+    const hash = await T.cancelStream({ company: state.company, id });
+    set((s) => ({ streams: s.streams.map((x) => (x.id === id ? { ...x, status: 'stopped' } : x)) }));
+    log({ kind: 'payroll', label: `Stopped the stream to ${stream?.name ?? 'contractor'} (earned part paid, rest returned)`, hash, memo: stream?.label });
+    return hash;
   },
 
   async runPayroll({ token, period }) {

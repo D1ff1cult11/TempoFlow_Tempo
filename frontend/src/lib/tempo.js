@@ -10,6 +10,8 @@ import {
   hexToString,
   publicActions,
   walletActions,
+  parseAbi,
+  encodeFunctionData,
 } from 'viem';
 import { tempoModerato } from 'viem/chains';
 import { generatePrivateKey } from 'viem/accounts';
@@ -267,4 +269,75 @@ export async function memoTransfers({ companyAddress, token, fromBlock, toBlock 
 export async function blockTime(blockNumber) {
   const b = await client.getBlock({ blockNumber: BigInt(blockNumber) });
   return Number(b.timestamp) * 1000;
+}
+
+// ---------- streaming payroll (issue #14) ----------
+// TempoPayrollStream on Tempo testnet: no owner or admin; every movement carries the stream id as its TIP-20 memo.
+export const PAYROLL_STREAM = '0x70d6e4df698adc0d91ab57a020877bc61e0597af';
+export const STREAM_ABI = parseAbi([
+  'function createStream(bytes32 streamId, address employee, address token, uint256 totalAmount, uint256 durationSeconds)',
+  'function withdrawFromStream(bytes32 streamId) returns (uint256)',
+  'function cancelStream(bytes32 streamId) returns (uint256 employeePayout, uint256 employerRefund)',
+  'function getStreamSummary(bytes32 streamId) view returns (address employer, address employee, address token, uint256 ratePerSecond, uint256 remainingBalance, uint256 claimableNow, bool isActive)',
+  'function getStream(bytes32 streamId) view returns ((address employer, address employee, address token, uint256 ratePerSecond, uint256 startTime, uint256 stopTime, uint256 remainingBalance, uint256 lastClaimTime, bool isActive))',
+]);
+
+/** Funds a stream in ONE Tempo transaction: approve + createStream (batched calls). The label becomes the memo. */
+export async function createStream({ company, employee, token, amount, durationSeconds, label, sponsored }) {
+  const id = encodeMemo(label);
+  const total = toUnits(amount);
+  const calls = [
+    { to: token, data: encodeFunctionData({ abi: Abis.tip20, functionName: 'approve', args: [PAYROLL_STREAM, total] }) },
+    {
+      to: PAYROLL_STREAM,
+      data: encodeFunctionData({ abi: STREAM_ABI, functionName: 'createStream', args: [id, employee, token, total, BigInt(durationSeconds)] }),
+    },
+  ];
+  const receipt = await (sponsored ? sponsoredClient : client).sendTransactionSync({
+    account: companyAccount(company),
+    calls,
+    ...(sponsored ? { feePayer: true } : {}),
+  });
+  if (receipt.status !== 'success') throw new Error('Creating the stream failed');
+  return { id, hash: receipt.transactionHash };
+}
+
+export async function streamInfo(id) {
+  const s = await client.readContract({ address: PAYROLL_STREAM, abi: STREAM_ABI, functionName: 'getStream', args: [id] });
+  const claimable = await client.readContract({ address: PAYROLL_STREAM, abi: STREAM_ABI, functionName: 'getStreamSummary', args: [id] });
+  return {
+    employer: s.employer,
+    employee: s.employee,
+    token: s.token,
+    perSecond: fromUnits(s.ratePerSecond),
+    start: Number(s.startTime) * 1000,
+    stop: Number(s.stopTime) * 1000,
+    remaining: fromUnits(s.remainingBalance),
+    claimable: fromUnits(claimable[5]),
+    active: s.isActive,
+  };
+}
+
+/** The contractor withdraws what has accrued (signs with their own account). */
+export async function withdrawStream({ account, id, sponsored }) {
+  const { request } = await client.simulateContract({ account, address: PAYROLL_STREAM, abi: STREAM_ABI, functionName: 'withdrawFromStream', args: [id] });
+  const receipt = await (sponsored ? sponsoredClient : client).sendTransactionSync({
+    account,
+    to: PAYROLL_STREAM,
+    data: encodeFunctionData({ abi: STREAM_ABI, functionName: 'withdrawFromStream', args: request.args }),
+    ...(sponsored ? { feePayer: true } : {}),
+  });
+  if (receipt.status !== 'success') throw new Error('Withdrawal failed');
+  return receipt.transactionHash;
+}
+
+/** The company stops a stream: the contractor gets what accrued, the rest returns to the company. */
+export async function cancelStream({ company, id }) {
+  const receipt = await client.sendTransactionSync({
+    account: companyAccount(company),
+    to: PAYROLL_STREAM,
+    data: encodeFunctionData({ abi: STREAM_ABI, functionName: 'cancelStream', args: [id] }),
+  });
+  if (receipt.status !== 'success') throw new Error('Cancelling the stream failed');
+  return receipt.transactionHash;
 }

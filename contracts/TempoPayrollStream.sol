@@ -1,14 +1,16 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-import "./interfaces/IERC20.sol";
+import "./interfaces/ITIP20.sol";
 import "./interfaces/ITempoPayrollStream.sol";
 
 /**
  * @title TempoPayrollStream
- * @notice O(1) Linear Continuous Stablecoin Streaming Payroll Engine for Tempo L1
- * @dev Enables employers to fund payroll streams where contractors and employees
- *      can withdraw accrued compensation down to the exact second at zero gas overhead.
+ * @notice Per-second streaming payroll on Tempo with TIP-20 stablecoins.
+ * @dev The employer escrows the full amount; pay accrues linearly every second and the employee can withdraw at
+ *      any time. Every token movement (funding, withdrawals, cancellation payouts and refunds) carries the
+ *      streamId as its TIP-20 memo, so streams reconcile in explorers and ledgers. Use a readable streamId
+ *      (e.g. "S-2026-11-priya" as 32 bytes) for human-readable memos.
  */
 contract TempoPayrollStream is ITempoPayrollStream {
     mapping(bytes32 => Stream) public streams;
@@ -29,7 +31,7 @@ contract TempoPayrollStream is ITempoPayrollStream {
      * @notice Creates and funds a new continuous payroll stream
      * @param streamId Unique deterministic identifier for the stream
      * @param employee Recipient contractor or employee wallet address
-     * @param token Payment stablecoin (e.g. USDC or EURC)
+     * @param token TIP-20 stablecoin (supports transferWithMemo / transferFromWithMemo)
      * @param totalAmount Total deposit amount to stream
      * @param durationSeconds Total duration of the payroll cycle in seconds
      */
@@ -62,8 +64,8 @@ contract TempoPayrollStream is ITempoPayrollStream {
             isActive: true
         });
 
-        // 2. Interactions: Escrow tokens into this contract
-        IERC20(token).transferFrom(msg.sender, address(this), totalAmount);
+        // 2. Interactions: escrow tokens into this contract, tagged with the stream id
+        require(ITIP20(token).transferFromWithMemo(msg.sender, address(this), totalAmount, streamId), "TRANSFER_FAILED");
 
         emit StreamCreated(
             streamId,
@@ -121,7 +123,7 @@ contract TempoPayrollStream is ITempoPayrollStream {
         }
 
         // Interactions
-        IERC20(s.token).transfer(s.employee, claimable);
+        ITIP20(s.token).transferWithMemo(s.employee, claimable, streamId); // reverts on failure
 
         emit StreamWithdrawn(streamId, s.employee, claimable, s.remainingBalance);
     }
@@ -157,11 +159,11 @@ contract TempoPayrollStream is ITempoPayrollStream {
 
         // Interactions
         if (employeePayout > 0) {
-            IERC20(token).transfer(worker, employeePayout);
+            ITIP20(token).transferWithMemo(worker, employeePayout, streamId);
         }
 
         if (employerRefund > 0) {
-            IERC20(token).transfer(emp, employerRefund);
+            ITIP20(token).transferWithMemo(emp, employerRefund, streamId);
         }
 
         emit StreamCancelled(streamId, emp, worker, employeePayout, employerRefund);
