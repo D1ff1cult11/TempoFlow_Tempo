@@ -1,0 +1,14 @@
+{
+  "network": "tempoTestnet",
+  "chainId": 42431,
+  "explorer": "https://explore.testnet.tempo.xyz",
+  "contracts": {
+    "TempoPayrollStream": {
+      "address": "0x70d6e4df698adc0d91ab57a020877bc61e0597af",
+      "txHash": "0x6a7c1481731b3bd3cce342a42a84d43fbaa74394b4bfd1169d020fda85df2f8c",
+      "blockNumber": 44819918,
+      "deployedAt": "2026-11-18T18:16:01.240Z",
+      "codeSize": 4171
+    }
+  }
+}

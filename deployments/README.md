@@ -1,6 +1,7 @@
 # Deployments
 
-**TempoFlow is not deployed to any public network yet** (no Tempo testnet or mainnet).
+**Tempo testnet (Moderato, 42431):** `TempoPayrollStream` is deployed. See [`tempoTestnet.json`](tempoTestnet.json). Deploy
+again with `npx hardhat compile && node scripts/deploy-payroll-stream.mjs`. Nothing is deployed to mainnet.
 
 `scripts/deploy.js` writes one file per network here, named after the Hardhat network
 (e.g. `localhost.json`, `tempoTestnet.json`), with the chain ID it actually deployed to.
