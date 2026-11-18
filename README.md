@@ -32,6 +32,7 @@ data, compute and services on their own). TempoFlow is the control panel for bot
 | Agent budgets: authorize, live remaining limit, change limit, revoke, team caps | ✅ **Live on Tempo testnet** (`viem/tempo` access keys) |
 | Pay runs: batched transfers with invoice memos | ✅ **Live on Tempo testnet** |
 | Ledger rebuilt from chain + CSV export | ✅ **Live on Tempo testnet** |
+| Alerts: low budget, limit used up, key expiring → Slack/Discord/any webhook | ✅ Checked while the Agents page is open, after each ledger sync, and daily by Vercel Cron (needs `CRON_SECRET`) |
 | Database ledger: full history, filters by type/agent/team/date | ✅ Supabase Postgres, synced from chain; sign in by signing a message (passkey or key), no passwords |
 | Stablecoin conversion via the Stablecoin DEX | ✅ **Live on Tempo testnet** |
 | Fee sponsorship | ✅ **Server-side** fee-payer relay (`frontend/api/relay.mjs`, a Vercel function). The sponsor key lives only in the server environment; the relay only sponsors stablecoin (TIP-20) calls on testnet |
@@ -99,7 +100,11 @@ node db/migrate.mjs                 # creates the tables (safe to re-run; Row Le
 node ../scripts/api-dev.mjs          # local stand-in for the Vercel functions (in another terminal)
 node scripts/test-api-session.mjs   # sign-in tests
 node scripts/test-api-ledger.mjs    # database ledger tests against testnet
+node scripts/test-api-alerts.mjs    # alerts (start api-dev with --throwaway --allow-local-webhooks)
 ```
+The daily alert check runs as a Vercel Cron job (`frontend/vercel.json`). Set `CRON_SECRET` in Vercel (any long random
+string) so only Vercel can trigger it.
+
 Sign-in sessions are signed with `TEMPOFLOW_SESSION_SECRET` (or the Supabase integration's `SUPABASE_JWT_SECRET`).
 
 ### Contracts (streaming payroll, merchant router, vault)
