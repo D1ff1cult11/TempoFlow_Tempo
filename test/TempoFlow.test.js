@@ -231,6 +231,27 @@ describe("⚡ TempoFlow Protocol Master Test Suite", function () {
         payroll.connect(stranger).withdrawFromStream(streamId)
       ).to.be.revertedWith("Only employee");
     });
+
+    it("TC-11: Every stream payment carries the stream id as its TIP-20 memo", async function () {
+      const label = ethers.encodeBytes32String("S-2026-11-priya");
+      const token = await usdc.getAddress();
+      const contract = await payroll.getAddress();
+
+      await expect(payroll.connect(owner).createStream(label, employee.address, token, depositAmount, duration))
+        .to.emit(usdc, "TransferWithMemo")
+        .withArgs(owner.address, contract, depositAmount, label);
+
+      await ethers.provider.send("evm_increaseTime", [600]);
+      await ethers.provider.send("evm_mine");
+      await expect(payroll.connect(employee).withdrawFromStream(label))
+        .to.emit(usdc, "TransferWithMemo")
+        .withArgs(contract, employee.address, (v) => v > 0n, label);
+
+      await expect(payroll.connect(owner).cancelStream(label))
+        .to.emit(usdc, "TransferWithMemo")
+        .withArgs(contract, owner.address, (v) => v > 0n, label);
+      expect(ethers.decodeBytes32String(label)).to.equal("S-2026-11-priya");
+    });
   });
 
   describe("3. Non-Custodial Merchant Settlement Vault (MerchantSettlementVault)", function () {

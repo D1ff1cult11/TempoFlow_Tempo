@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-import "../interfaces/IERC20.sol";
+import "../interfaces/ITIP20.sol";
 
 /**
  * @title MockERC20
- * @notice Realistic mock token configured with 6 decimals (standard for USDC and EURC on Tempo L1)
+ * @notice Test stand-in for a Tempo TIP-20 stablecoin: ERC-20 with 6 decimals plus memo transfers.
  */
-contract MockERC20 is IERC20 {
+contract MockERC20 is ITIP20 {
     string private _name;
     string private _symbol;
     uint8 private immutable _decimals;
@@ -65,6 +65,24 @@ contract MockERC20 is IERC20 {
             }
         }
         _transfer(from, to, amount);
+        return true;
+    }
+
+    function transferWithMemo(address to, uint256 amount, bytes32 memo) external override {
+        _transfer(msg.sender, to, amount);
+        emit TransferWithMemo(msg.sender, to, amount, memo);
+    }
+
+    function transferFromWithMemo(address from, address to, uint256 amount, bytes32 memo) external override returns (bool) {
+        uint256 currentAllowance = _allowances[from][msg.sender];
+        if (currentAllowance != type(uint256).max) {
+            require(currentAllowance >= amount, "ERC20: insufficient allowance");
+            unchecked {
+                _approve(from, msg.sender, currentAllowance - amount);
+            }
+        }
+        _transfer(from, to, amount);
+        emit TransferWithMemo(from, to, amount, memo);
         return true;
     }
 
