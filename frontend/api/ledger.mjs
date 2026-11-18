@@ -6,6 +6,7 @@ import { json, handler, requireDb, badRequest } from './_db.mjs';
 import { requireCompany } from './_auth.mjs';
 import { spendEvents, memoTransfers, blockTime, client, TOKENS } from '../src/lib/tempo.js';
 import { matchEvents } from '../src/lib/ledger-core.js';
+import { evaluateAlerts } from './_alerts.mjs';
 
 const WINDOW = 400_000n; // blocks per sync call (~4 RPC chunks per event type): keeps each call well under 10s
 const START_LOOKBACK = 500_000n; // first sync without a hint starts this far back
@@ -55,6 +56,8 @@ export const POST = handler(async (request) => {
   await sql`
     insert into sync_state (company, last_block) values (${company}, ${to.toString()})
     on conflict (company) do update set last_block = excluded.last_block, updated_at = now()`;
+  // Budgets changed: check alert rules right away (failures here must not break the sync).
+  if (to >= latest) await evaluateAlerts(sql, company).catch((e) => console.error('alerts', e.message));
   return json({ added, lastBlock: Number(to), caughtUp: to >= latest });
 });
 
