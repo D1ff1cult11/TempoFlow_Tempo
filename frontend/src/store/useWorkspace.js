@@ -154,6 +154,7 @@ export const actions = {
     const hash = await T.updateAgentLimit({ company: state.company, agent, newLimit });
     set((s) => ({ agents: s.agents.map((a) => (a.id === agentId ? { ...a, dailyLimit: Number(newLimit) } : a)) }));
     log({ kind: 'agent', label: `Changed "${agent.name}" limit to ${T.usd(newLimit)}/day`, hash });
+    return hash;
   },
 
   async revoke(agentId) {

@@ -10,6 +10,7 @@ even buggy or compromised agent code can't overspend. This package makes the age
 - `paidFetch()` to call paid APIs over [MPP](https://mpp.dev) (HTTP 402) from the same budget
 - clear errors: `BudgetExceededError`, `KeyNotAllowedError`
 - `generateAgentKey()` so the key can be created inside the agent runtime
+- `requestLimit()` to ask the company for a higher daily limit (an admin approves it in TempoFlow)
 
 > Status: early, testnet first. Not published to npm yet; use it from this repo.
 
@@ -38,6 +39,15 @@ await agent.pay({ to: vendor, amount: '2.50', task: '1042' }); // memo "a:resear
 
 const paidFetch = await agent.paidFetch({ maxPerCall: '0.25' });
 const res = await paidFetch('https://api.example.com/paid');   // pays the 402 automatically
+```
+
+When the budget is too small for a job, ask for more. The request is signed with the agent's own key, and the company
+sees it under Agents → Limit requests:
+
+```js
+if (!(await agent.canSpend('20'))) {
+  await agent.requestLimit({ newLimit: 25, reason: 'nightly crawl needs ~0' }); // uses serverUrl or relayUrl's origin
+}
 ```
 
 `maxPerCall` is an extra guard inside the agent: any single API charge above it is refused before signing. Tempo's

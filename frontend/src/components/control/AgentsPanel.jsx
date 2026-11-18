@@ -4,6 +4,7 @@ import { useWorkspace, actions, teamAllocated } from '../../store/useWorkspace';
 import { TOKENS, DEFAULT_TOKEN, tokenSymbol, usd, remainingLimit, short } from '../../lib/tempo';
 import { AsyncButton, Result, AddressLink, TxLink, Field, Bar } from './ui';
 import { AlertsCard } from './AlertsCard';
+import { LimitRequestsCard } from './LimitRequestsCard';
 
 const isAddress = (a) => /^0x[0-9a-fA-F]{40}$/.test(a.trim());
 
@@ -415,6 +416,7 @@ export function AgentsPanel() {
   return (
     <div className="cp-stack">
       <TeamsCard />
+      <LimitRequestsCard />
       <AlertsCard />
       <NewAgentCard />
       <div className="glass-panel cp-card cp-stack">

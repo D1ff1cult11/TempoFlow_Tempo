@@ -108,3 +108,7 @@ export const addAlert = (rule) => call('/api/alerts', { method: 'POST', body: ru
 export const deleteAlert = (id) => call(`/api/alerts?id=${encodeURIComponent(id)}`, { method: 'DELETE' });
 export const testAlert = (id) => call('/api/alerts', { method: 'POST', body: { action: 'test', id } });
 export const checkAlerts = () => call('/api/alerts', { method: 'POST', body: { action: 'check' } });
+
+// ---------- limit-raise requests (issue #7) ----------
+export const listLimitRequests = () => call('/api/limit-requests');
+export const decideLimitRequest = (id, status, tx) => call('/api/limit-requests', { method: 'PATCH', body: { id, status, tx } });
