@@ -47,6 +47,11 @@ export function taskMemo(agentName, task) {
   return stringToHex(text, { size: 32 });
 }
 
+/** The text an agent signs to ask for a higher limit. Must match limitRequestMessage() in frontend/api/limit-requests.mjs. */
+export function limitRequestMessage({ company, requestedLimit, reason, timestamp }) {
+  return `TempoFlow limit request\n\nCompany: ${String(company).toLowerCase()}\nNew daily limit: ${Number(requestedLimit)}\nReason: ${reason || ''}\nTime: ${timestamp}`;
+}
+
 /** Create a fresh agent key inside the agent runtime. Register only `keyAddress` with TempoFlow. */
 export function generateAgentKey() {
   const privateKey = P256.randomPrivateKey();
@@ -64,8 +69,9 @@ export function generateAgentKey() {
  * @param {string} [options.relayUrl]             TempoFlow fee-payer relay (e.g. https://your-app/api/relay). Fees then don't use the budget.
  * @param {string} [options.rpcUrl]               Custom Tempo RPC URL.
  * @param {`0x${string}`} [options.keyAddress]    The key address TempoFlow authorized; checked against privateKey.
+ * @param {string} [options.serverUrl]            TempoFlow app URL for requests to the company (defaults to relayUrl's origin).
  */
-export function createAgent({ privateKey, companyAddress, token, name = 'agent', network = 'testnet', relayUrl, rpcUrl, keyAddress }) {
+export function createAgent({ privateKey, companyAddress, token, name = 'agent', network = 'testnet', relayUrl, rpcUrl, keyAddress, serverUrl }) {
   if (!privateKey || !companyAddress || !token) throw new Error('privateKey, companyAddress and token are required');
   const chain = NETWORKS[network];
   if (!chain) throw new Error(`Unknown network "${network}"`);
@@ -104,6 +110,26 @@ export function createAgent({ privateKey, companyAddress, token, name = 'agent',
       } catch (e) {
         throw classify(e);
       }
+    },
+
+    /**
+     * Ask the company to raise this agent's daily limit. Signed with the agent's own key; an admin approves it in
+     * TempoFlow (which then changes the limit on Tempo). Returns the pending request.
+     */
+    async requestLimit({ newLimit, reason = '' }) {
+      const base = serverUrl ?? (relayUrl ? new URL(relayUrl).origin : null);
+      if (!base) throw new Error('Set serverUrl (your TempoFlow app URL) to send requests to the company');
+      const timestamp = Date.now();
+      const message = limitRequestMessage({ company: companyAddress, requestedLimit: newLimit, reason, timestamp });
+      const signature = await account.signMessage({ message });
+      const r = await fetch(`${base}/api/limit-requests`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ company: companyAddress, requestedLimit: Number(newLimit), reason, timestamp, signature }),
+      });
+      const data = await r.json().catch(() => null);
+      if (!r.ok) throw new Error(data?.error || `TempoFlow answered ${r.status}`);
+      return data.request;
     },
 
     /** How much of today's budget is left, read live from Tempo. */
