@@ -2,6 +2,7 @@
 // Reads frontend/.env.local (database, sponsor key, …) without printing anything.
 //   node scripts/api-dev.mjs              -> http://localhost:8787/api/<name>
 //   node scripts/api-dev.mjs --throwaway  -> fee relay uses a fresh in-memory testnet key funded by the faucet (never printed)
+//   node scripts/api-dev.mjs --allow-local-webhooks  -> lets alert rules post to http://localhost (tests only)
 
 import { createServer } from 'node:http';
 import { existsSync } from 'node:fs';
@@ -12,6 +13,7 @@ import { generatePrivateKey, privateKeyToAccount } from 'viem/accounts';
 import { tempoActions } from 'viem/tempo';
 
 await import('../frontend/db/env.mjs');
+if (process.argv.includes('--allow-local-webhooks')) process.env.TEMPOFLOW_ALLOW_LOCAL_WEBHOOKS = '1'; // tests only
 
 if (process.argv.includes('--throwaway')) {
   process.env.TEMPO_SPONSOR_PRIVATE_KEY = generatePrivateKey();
