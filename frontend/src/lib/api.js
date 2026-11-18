@@ -112,3 +112,12 @@ export const checkAlerts = () => call('/api/alerts', { method: 'POST', body: { a
 // ---------- limit-raise requests (issue #7) ----------
 export const listLimitRequests = () => call('/api/limit-requests');
 export const decideLimitRequest = (id, status, tx) => call('/api/limit-requests', { method: 'PATCH', body: { id, status, tx } });
+
+// ---------- contractor invites (issue #12) ----------
+export const listInvites = () => call('/api/invites');
+export const createInvite = (name, amount) => call('/api/invites', { method: 'POST', body: { name, amount } });
+export const decideInvite = (id, status) => call('/api/invites', { method: 'PATCH', body: { id, status } });
+export const viewJoin = (code) => call(`/api/join?code=${encodeURIComponent(code)}`);
+export const submitJoin = (body) => call('/api/join', { method: 'POST', body });
+/** Must match joinMessage() in frontend/api/join.mjs. */
+export const joinMessage = (inviteId, wallet) => `TempoFlow: join as a contractor\n\nInvite: ${inviteId}\nWallet: ${String(wallet).toLowerCase()}`;
